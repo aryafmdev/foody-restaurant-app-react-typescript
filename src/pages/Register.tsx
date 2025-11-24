@@ -27,7 +27,7 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-sm mx-auto p-2xl">
+    <div className="mx-auto p-2xl">
       <Card>
         <CardHeader>
           <div className="text-lg font-bold">Register</div>
