@@ -7,8 +7,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-white hover:opacity-90',
-        secondary: 'bg-neutral-900 text-white hover:opacity-90',
+        primary: 'bg-primary-100 text-neutral-25 font-bold hover:opacity-90',
+        secondary: 'bg-neutral-300 text-neutral-950 font-bold hover:opacity-90',
         neutral: 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200',
         danger: 'bg-accent-red text-white hover:opacity-90',
         outline:
@@ -17,9 +17,9 @@ const buttonVariants = cva(
         link: 'bg-transparent text-primary underline-offset-4 hover:underline',
       },
       size: {
-        sm: 'h-8 px-sm text-sm rounded-sm',
-        md: 'h-10 px-md text-md rounded-md',
-        lg: 'h-12 px-xl text-lg rounded-lg',
+        sm: 'h-8 px-sm text-sm rounded-full',
+        md: 'h-10 px-md text-md rounded-full',
+        lg: 'h-12 px-xl text-lg rounded-full',
       },
     },
     defaultVariants: {

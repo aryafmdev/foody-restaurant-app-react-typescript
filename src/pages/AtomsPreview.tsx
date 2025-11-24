@@ -63,7 +63,7 @@ export default function AtomsPreview() {
         <CardHeader>
           <div className='text-lg font-bold'>Inputs</div>
         </CardHeader>
-        <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-lg'>
+        <CardContent className='grid gap-lg'>
           <div className='space-y-sm'>
             <Label htmlFor='name'>Name</Label>
             <Input id='name' placeholder='Your name' />
@@ -116,7 +116,7 @@ export default function AtomsPreview() {
           <div className='text-lg font-bold'>Feedback</div>
         </CardHeader>
         <CardContent className='space-y-md'>
-          <div className='flex items-center gap-md'>
+          <div className='grid grid-cols items-center gap-md'>
             <Spinner />
             <Skeleton className='h-6 w-40' />
             <Skeleton className='h-6 w-40' />
@@ -143,14 +143,18 @@ export default function AtomsPreview() {
           <div className='space-y-sm'>
             <Image
               alt='Food'
-              src='https://images.unsplash.com/photo-1606756790138-6fb5d4b3c6fb?w=600&q=80'
+              src='../../src/assets/images/image.png'
               className='h-32'
             />
-            <Image alt='Invalid' src='' className='h-32' />
+            <Image
+              alt='Invalid'
+              src='../../src/assets/images/burger-king.png'
+              className='h-32'
+            />
           </div>
           <div className='space-y-sm'>
             <Avatar name='John Doe' />
-            <Avatar name='Jane' src='https://i.pravatar.cc/100' />
+            <Avatar name='Jack' src='../../src/assets/images/avatar.png' />
           </div>
           <div className='space-y-sm'>
             <div className='flex items-center gap-xxs'>

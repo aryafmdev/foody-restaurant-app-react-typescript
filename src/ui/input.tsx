@@ -13,7 +13,7 @@ export function Input({
   ...props
 }: InputProps) {
   const base =
-    'w-full outline-none transition-colors placeholder:text-neutral-500';
+    'w-full font-regular outline-none transition-colors placeholder:text-neutral-500';
   const sizes = {
     sm: 'h-8 px-sm text-sm rounded-sm',
     md: 'h-10 px-md text-md rounded-md',
