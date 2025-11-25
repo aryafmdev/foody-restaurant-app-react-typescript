@@ -1,19 +1,21 @@
-import type { HTMLAttributes } from 'react'
-import { Star as LucideStar } from 'lucide-react'
-import { cn } from '../lib/cn'
+import type { HTMLAttributes } from 'react';
+import { cn } from '../lib/cn';
+import { Icon } from './icon';
 
 type StarProps = {
-  filled?: boolean
-  size?: number
-} & HTMLAttributes<SVGSVGElement>
+  filled?: boolean;
+  size?: number;
+} & Pick<HTMLAttributes<HTMLSpanElement>, 'className'>;
 
-export function Star({ filled = false, size = 16, className, ...props }: StarProps) {
+export function Star({ filled = false, size = 16, className }: StarProps) {
+  const name = filled
+    ? 'material-symbols:star'
+    : 'material-symbols:star-outline';
   return (
-    <LucideStar
-      width={size}
-      height={size}
-      className={cn(filled ? 'fill-primary text-primary' : 'text-neutral-500', className)}
-      {...props}
+    <Icon
+      name={name}
+      size={size}
+      className={cn(filled ? 'text-primary' : 'text-neutral-500', className)}
     />
-  )
+  );
 }

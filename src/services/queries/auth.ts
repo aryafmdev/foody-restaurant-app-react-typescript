@@ -33,13 +33,14 @@ export function useLoginMutation() {
   });
 }
 
-export function useProfileQuery() {
+export function useProfileQuery(enabled: boolean = true) {
   return useQuery({
     queryKey: ['auth', 'profile'],
     queryFn: async () => {
       const res = await http.get('/api/auth/profile');
       return ProfileResponseSchema.parse(res.data);
     },
+    enabled,
   });
 }
 

@@ -21,3 +21,4 @@ export * from './star';
 export * from './tooltip';
 export * from './dot';
 export * from './switch';
+export * from './icon';
