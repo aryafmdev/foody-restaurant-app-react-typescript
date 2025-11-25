@@ -5,6 +5,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import RestaurantDetail from '../pages/RestaurantDetail';
 import AtomsPreview from '../pages/AtomsPreview';
+import MoleculesPreview from '../pages/MoleculesPreview';
 import { Navbar } from '../components';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
         <Route path='/cart' element={<Cart />} />
         <Route path='/restaurant/:id' element={<RestaurantDetail />} />
         <Route path='/dev/atoms' element={<AtomsPreview />} />
+        <Route path='/dev/molecules' element={<MoleculesPreview />} />
       </Routes>
     </div>
   );
