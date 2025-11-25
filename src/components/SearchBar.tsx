@@ -1,7 +1,6 @@
 import { cn } from '../lib/cn';
 import { Input } from '../ui/input';
-import { IconButton } from '../ui/icon-button';
-import { Search } from 'lucide-react';
+import { Icon } from '../ui/icon';
 
 type SearchBarProps = {
   value: string;
@@ -19,15 +18,19 @@ export default function SearchBar({
   className,
 }: SearchBarProps) {
   return (
-    <div className={cn('flex items-center gap-sm', className)}>
+    <div className={cn('relative w-full', className)}>
+      <Icon name='mingcute:search-line' size={30} className='absolute left-md top-1/2 -translate-y-1/2 text-neutral-500' />
       <Input
+        type='search'
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        uiSize='lg'
+        className='rounded-full pl-10'
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onSubmit?.();
+        }}
       />
-      <IconButton aria-label='Search' onClick={onSubmit}>
-        <Search size={18} />
-      </IconButton>
     </div>
   );
 }

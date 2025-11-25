@@ -10,6 +10,7 @@ import {
   RatingGroup,
   PriceWithBadge,
   ReviewCard,
+  ProductCard,
   RestaurantInfoCard,
   CartItemRow,
   EmptyState,
@@ -82,14 +83,22 @@ export default function MoleculesPreview() {
         <CardHeader>
           <div className='text-lg font-bold'>Cards & Rows</div>
         </CardHeader>
-        <CardContent className='grid grid-cols-1 md:grid-cols-2 gap-lg'>
+        <CardContent className='grid grid-cols-1 gap-lg'>
           <ReviewCard
             name='John Doe'
             rating={5}
             comment='Burger enak, pengantaran cepat.'
             date='2024-01-20'
           />
-          <RestaurantInfoCard name='Burger King' place='Jakarta' rating={4} />
+          <div className=''>
+            <ProductCard title='Food Name' price={50000} initialQty={0} />
+          </div>
+          <RestaurantInfoCard
+            name='Burger King'
+            place='Jakarta Selatan'
+            distanceKm={2.4}
+            rating={4.9}
+          />
           <CartItemRow
             title='Cheese Burger'
             price={32000}
