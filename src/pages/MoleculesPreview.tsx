@@ -23,6 +23,7 @@ import {
   AddressSummaryRow,
   OrderSummary,
   ProfileMiniCard,
+  SidebarProfile,
 } from '../components';
 
 export default function MoleculesPreview() {
@@ -141,6 +142,9 @@ export default function MoleculesPreview() {
             onQuantityChange={() => {}}
           />
           <ProfileMiniCard name='Guest' />
+          <div className='mt-3xl max-w-[320px]'>
+            <SidebarProfile name='John Doe' />
+          </div>
         </CardContent>
       </Card>
 
