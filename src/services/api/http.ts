@@ -12,8 +12,10 @@ export const http = axios.create({
 })
 
 http.interceptors.request.use((config) => {
+  const url = config.url ?? ''
+  const isAuthEndpoint = /\/auth\/(login|register)/.test(url)
   const token = tokenProvider ? tokenProvider() : null
-  if (token) {
+  if (token && !isAuthEndpoint) {
     config.headers = config.headers ?? {}
     config.headers.Authorization = `Bearer ${token}`
   }

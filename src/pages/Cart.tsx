@@ -1,9 +1,12 @@
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardFooter } from '../ui/card'
 import { useCartQuery, useUpdateCartItemMutation, useDeleteCartItemMutation, useClearCartMutation } from '../services/queries/cart'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../app/store'
 
 export default function Cart() {
-  const { data, isLoading } = useCartQuery()
+  const userId = useSelector((s: RootState) => s.auth.userId)
+  const { data, isLoading } = useCartQuery(userId, !!userId)
   const updateQty = useUpdateCartItemMutation()
   const removeItem = useDeleteCartItemMutation()
   const clearCart = useClearCartMutation()

@@ -25,6 +25,7 @@ export default function Navbar({
   cartCountOverride,
 }: NavbarProps) {
   const token = useSelector((s: RootState) => s.auth.token);
+  const userId = useSelector((s: RootState) => s.auth.userId);
   const isLoggedIn = typeof loggedIn === 'boolean' ? loggedIn : !!token;
   const [atTop, setAtTop] = useState<boolean>(mode ? mode === 'top' : true);
 
@@ -36,7 +37,7 @@ export default function Navbar({
     return () => window.removeEventListener('scroll', onScroll);
   }, [mode]);
 
-  const { data: cart } = useCartQuery(isLoggedIn);
+  const { data: cart } = useCartQuery(userId, isLoggedIn);
   const { data: profile } = useProfileQuery(isLoggedIn);
 
   const cartCount =
@@ -127,7 +128,7 @@ export default function Navbar({
             <Button
               variant={atTop ? 'neutral' : 'primary'}
               className={atTop ? btnSolidTop : undefined}
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login?tab=signup')}
             >
               Sign Up
             </Button>

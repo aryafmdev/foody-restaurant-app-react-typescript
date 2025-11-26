@@ -20,6 +20,14 @@ import { Checkbox, CheckboxLabel } from '../ui/checkbox';
 import { Radio, RadioLabel } from '../ui/radio';
 import { Tooltip, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { TooltipContent } from '../ui/tooltip';
+import { Icon } from '../ui/icon';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '../ui/dialog';
 import {
   Select,
   SelectTrigger,
@@ -28,7 +36,7 @@ import {
   SelectItem,
 } from '../ui/select';
 import { formatCurrency } from '../lib/format';
-import { Search, ShoppingCart, Heart } from 'lucide-react';
+import { Search, Heart } from 'lucide-react';
 
 export default function AtomsPreview() {
   return (
@@ -49,9 +57,6 @@ export default function AtomsPreview() {
           <Button size='lg'>Large</Button>
           <IconButton aria-label='Search'>
             <Search size={18} />
-          </IconButton>
-          <IconButton variant='primary' aria-label='Cart'>
-            <ShoppingCart size={18} />
           </IconButton>
           <IconButton variant='ghost' aria-label='Fav'>
             <Heart size={18} />
@@ -166,6 +171,13 @@ export default function AtomsPreview() {
               <Dot />
               <Dot active />
             </div>
+            <div className='flex items-center gap-sm'>
+              <Icon name='mdi:instagram' />
+              <Icon name='ri:facebook-fill' />
+              <Icon name='ri:linkedin-fill' />
+              <Icon name='ic:baseline-tiktok' />
+              <Icon name='material-symbols:star-rounded' />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -194,6 +206,23 @@ export default function AtomsPreview() {
               <TooltipContent>Tooltip text</TooltipContent>
             </Tooltip>
           </TooltipProvider>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className='text-lg font-bold'>Dialog</div>
+        </CardHeader>
+        <CardContent>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant='primary'>Open Dialog</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Dialog Title</DialogTitle>
+              <DialogDescription>Dialog content goes here</DialogDescription>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </Container>

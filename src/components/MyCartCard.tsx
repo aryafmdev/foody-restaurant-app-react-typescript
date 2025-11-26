@@ -59,7 +59,7 @@ export default function MyCartCard({
               price={it.price}
               imageUrl={it.imageUrl ?? itemDefaultImg}
               quantity={it.quantity}
-              onQuantityChange={(q) => {
+              onQuantityChange={(q: number) => {
                 if (onChangeItemQty) {
                   onChangeItemQty(i, q);
                 } else {

@@ -16,8 +16,8 @@ export function Input({
     'w-full font-regular outline-none transition-colors placeholder:text-neutral-500';
   const sizes = {
     sm: 'h-8 px-sm text-sm rounded-sm',
-    md: 'h-10 px-md text-md rounded-md',
-    lg: 'h-12 px-xl text-lg rounded-lg',
+    md: 'h-10 px-md text-md rounded-sm',
+    lg: 'h-12 px-xl text-lg rounded-sm',
   }[uiSize];
   const variants = {
     default:

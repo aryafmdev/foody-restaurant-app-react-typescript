@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { http } from '../api/http';
 import { GetCartResponseSchema, AddCartItemResponseSchema } from '../../types/schemas';
 
-export function useCartQuery(enabled: boolean = true) {
+export function useCartQuery(userId?: string | null, enabled: boolean = true) {
   return useQuery({
-    queryKey: ['cart'],
+    queryKey: ['cart', userId ?? 'guest'],
     queryFn: async () => {
       const res = await http.get('/api/cart');
       return GetCartResponseSchema.parse(res.data);

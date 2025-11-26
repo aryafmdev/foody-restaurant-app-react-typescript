@@ -23,12 +23,19 @@ export function Checkbox({
   }, [indeterminate]);
 
   const dims = uiSize === 'sm' ? 'h-4 w-4' : 'h-5 w-5';
-  const baseBox = 'inline-block rounded-sm border bg-white';
+  const baseBox = 'inline-block rounded-xs border bg-white transition-colors';
+  const isChecked = !!props.checked;
   const states = cn(
     'border-neutral-300',
     variant === 'primary'
-      ? 'peer-checked:bg-primary peer-checked:border-primary'
-      : 'peer-checked:bg-neutral-900 peer-checked:border-neutral-900',
+      ? cn(
+          isChecked && 'bg-primary border-primary',
+          'peer-checked:bg-primary peer-checked:border-primary'
+        )
+      : cn(
+          isChecked && 'bg-neutral-900 border-neutral-900',
+          'peer-checked:bg-neutral-900 peer-checked:border-neutral-900'
+        ),
     'peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40',
     'peer-disabled:bg-neutral-200 peer-disabled:border-neutral-300'
   );
@@ -58,14 +65,25 @@ export function Checkbox({
             className='text-white'
           />
         ) : (
-          <Icon
-            name='material-symbols:check'
-            size={iconSize}
+          <svg
+            width={iconSize}
+            height={iconSize}
+            viewBox='0 0 24 24'
             className={cn(
-              'text-white opacity-0 transition-opacity',
+              'opacity-0 transition-opacity',
+              isChecked && 'opacity-100',
               'peer-checked:opacity-100'
             )}
-          />
+          >
+            <path
+              d='M20 6L9 17l-5-5'
+              fill='none'
+              stroke='white'
+              strokeWidth='3'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </svg>
         )}
       </span>
     </label>

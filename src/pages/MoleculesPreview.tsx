@@ -1,4 +1,5 @@
 import { Container } from '../ui/container';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
 import { ShoppingCart, Heart, Search, MapPin } from 'lucide-react';
@@ -14,7 +15,6 @@ import {
   MyCartCard,
   MyOrderCard,
   RestaurantInfoCard,
-  CartItemRow,
   EmptyState,
   AlertBanner,
   PaginationDots,
@@ -22,11 +22,13 @@ import {
   MapPinChip,
   AddressSummaryRow,
   OrderSummary,
-  ProfileMiniCard,
   SidebarProfile,
+  QuantityStepper,
+  FooterLinkColumn,
 } from '../components';
 
 export default function MoleculesPreview() {
+  const [qty, setQty] = useState(1);
   return (
     <Container className='py-2xl space-y-2xl'>
       <Card>
@@ -134,14 +136,6 @@ export default function MoleculesPreview() {
               ]}
             />
           </div>
-          <CartItemRow
-            title='Cheese Burger'
-            price={32000}
-            imageUrl={undefined}
-            quantity={2}
-            onQuantityChange={() => {}}
-          />
-          <ProfileMiniCard name='Guest' />
           <div className='mt-3xl max-w-[320px]'>
             <SidebarProfile name='John Doe' />
           </div>
@@ -183,6 +177,28 @@ export default function MoleculesPreview() {
         <CardFooter>
           <Button className='w-full'>Checkout</Button>
         </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className='text-lg font-bold'>Utilities</div>
+        </CardHeader>
+        <CardContent className='space-y-md'>
+          <div className='flex items-center gap-lg'>
+            <QuantityStepper value={qty} onChange={setQty} />
+            <div className='text-sm text-neutral-700'>Qty: {qty}</div>
+          </div>
+          <div className='bg-neutral-500 max-w-[360px]'>
+            <FooterLinkColumn
+              title='Help'
+              links={[
+                { label: 'FAQ', href: '#' },
+                { label: 'Support', href: '#' },
+                { label: 'Terms', href: '#' },
+              ]}
+            />
+          </div>
+        </CardContent>
       </Card>
     </Container>
   );
