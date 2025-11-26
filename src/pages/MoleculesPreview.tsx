@@ -12,6 +12,7 @@ import {
   ReviewCard,
   ProductCard,
   MyCartCard,
+  MyOrderCard,
   RestaurantInfoCard,
   CartItemRow,
   EmptyState,
@@ -115,6 +116,19 @@ export default function MoleculesPreview() {
                   price: 50000,
                   imageUrl: undefined,
                   quantity: 1,
+                },
+              ]}
+            />
+          </div>
+          <div className='mt-3xl'>
+            <MyOrderCard
+              storeName='Burger King'
+              items={[
+                {
+                  title: 'Food Name',
+                  unitPrice: 50000,
+                  imageUrl: undefined,
+                  quantity: 2,
                 },
               ]}
             />
