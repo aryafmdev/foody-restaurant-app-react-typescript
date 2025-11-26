@@ -11,6 +11,7 @@ import {
   PriceWithBadge,
   ReviewCard,
   ProductCard,
+  MyCartCard,
   RestaurantInfoCard,
   CartItemRow,
   EmptyState,
@@ -99,6 +100,25 @@ export default function MoleculesPreview() {
             distanceKm={2.4}
             rating={4.9}
           />
+          <div className='mt-3xl'>
+            <MyCartCard
+              storeName='Burger King'
+              items={[
+                {
+                  title: 'Food Name',
+                  price: 50000,
+                  imageUrl: undefined,
+                  quantity: 1,
+                },
+                {
+                  title: 'Food Name',
+                  price: 50000,
+                  imageUrl: undefined,
+                  quantity: 1,
+                },
+              ]}
+            />
+          </div>
           <CartItemRow
             title='Cheese Burger'
             price={32000}

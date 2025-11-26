@@ -11,6 +11,7 @@ export { default as QuantityStepper } from './QuantityStepper';
 export { default as ReviewCard } from './ReviewCard';
 export { default as RestaurantInfoCard } from './RestaurantInfoCard';
 export { default as CartItemRow } from './CartItemRow';
+export { default as MyCartCard } from './MyCartCard';
 export { default as EmptyState } from './EmptyState';
 export { default as AlertBanner } from './AlertBanner';
 export { default as PaginationDots } from './PaginationDots';

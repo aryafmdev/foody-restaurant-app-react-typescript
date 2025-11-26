@@ -53,7 +53,7 @@ export default function ProductCard({
           {qty === 0 ? (
             <Button
               variant='primary'
-              size='sm'
+              size='md'
               className='w-full md:w-auto md:mt-none mt-lg'
               onClick={add}
             >
