@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -64,6 +64,7 @@ export default function Navbar({
   const btnSolidTop = 'bg-white text-neutral-900 hover:opacity-95';
 
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const qc = useQueryClient();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -80,7 +81,12 @@ export default function Navbar({
   return (
     <nav className={navClass} ref={navRef}>
       <Container className='flex items-center justify-between py-sm md:py-md'>
-        <Link to='/' className='inline-flex items-center gap-sm'>
+        <Link to='/' className='inline-flex items-center gap-sm' onClick={(e) => {
+          if (location.pathname === '/') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+          }
+        }}>
           <span
             aria-label='Foody logo'
             className={cn(

@@ -15,20 +15,14 @@ export default function CategoryCard({
   return (
     <button type='button' onClick={onClick} className='w-full'>
       <div className='flex flex-col items-center'>
-        <Card className='rounded-2xl shadow-md border-none bg-white'>
-          <CardContent className='p-xl'>
-            <div className='flex items-center justify-center'>
-              <div className='h-12 w-12 rounded-lg overflow-hidden bg-neutral-100'>
-                <Image
-                  alt={label}
-                  src={image}
-                  className='h-full w-full object-contain'
-                />
-              </div>
+        <Card className='rounded-lg border border-neutral-200 bg-white shadow-sm size-20 md:w-27'>
+          <CardContent className='p-none h-full'>
+            <div className='h-full w-full flex items-center justify-center'>
+              <Image alt={label} src={image} className='size-12 border-none bg-transparent object-contain' />
             </div>
           </CardContent>
         </Card>
-        <div className='mt-xs text-sm text-neutral-900'>{label}</div>
+        <div className='mt-xs text-sm md:text-md font-bold text-neutral-950'>{label}</div>
       </div>
     </button>
   );

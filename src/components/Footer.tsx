@@ -1,16 +1,23 @@
 import type { CSSProperties } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/images/logo.png';
 import { Container } from '../ui/container';
 import { Icon } from '../ui/icon';
 import FooterLinkColumn from './FooterLinkColumn';
 
 export default function Footer() {
+  const location = useLocation();
   return (
     <footer className='bg-neutral-950 text-white py-6xl'>
       <Container className='py-2xl'>
         <div className='grid md:grid-cols-3 gap-y-2xl md:items-start'>
           <div className='space-y-2xl md:justify-self-start'>
-            <div className='inline-flex items-center gap-sm'>
+            <Link to='/' className='inline-flex items-center gap-sm' onClick={(e) => {
+              if (location.pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+              }
+            }}>
               <span
                 aria-label='Foody logo'
                 className='inline-block h-8 w-8 bg-primary'
@@ -27,8 +34,8 @@ export default function Footer() {
                   } as CSSProperties
                 }
               />
-              <span className='font-extrabold text-display-md'>Foody</span>
-            </div>
+              <span className='font-extrabold text-white text-display-md'>Foody</span>
+            </Link>
             <p className='text-md text-neutral-300'>
               Enjoy homemade flavors & chef's signature dishes, freshly prepared
               every day. Order online or visit our nearest branch.

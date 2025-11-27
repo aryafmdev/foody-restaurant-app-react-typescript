@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import Home from '../pages/Home';
 import Profile from '../pages/Profile';
 import Cart from '../pages/Cart';
@@ -13,6 +14,11 @@ export default function App() {
   const location = useLocation();
   const hideNav = location.pathname === '/login';
   const isHome = location.pathname === '/';
+  useEffect(() => {
+    if (location.pathname === '/') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname]);
   return (
     <div className='min-h-screen bg-white text-neutral-900 flex flex-col'>
       {hideNav ? null : (
