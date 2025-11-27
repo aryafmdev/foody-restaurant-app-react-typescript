@@ -11,7 +11,7 @@ export default function FooterLinkColumn({
 }: FooterLinkColumnProps) {
   return (
     <div>
-      <div className='text-md font-semibold mb-2xl'>{title}</div>
+      <div className='text-lg font-extrabold mb-2xl'>{title}</div>
       <div className='space-y-2xl'>
         {links.map((l) => (
           <div key={l.href}>

@@ -6,10 +6,10 @@ import FooterLinkColumn from './FooterLinkColumn';
 
 export default function Footer() {
   return (
-    <footer className='bg-neutral-950 text-white'>
+    <footer className='bg-neutral-950 text-white py-6xl'>
       <Container className='py-2xl'>
-        <div className='grid md:grid-cols-3 gap-2xl'>
-          <div className='space-y-2xl'>
+        <div className='grid md:grid-cols-3 gap-y-2xl md:items-start'>
+          <div className='space-y-2xl md:justify-self-start'>
             <div className='inline-flex items-center gap-sm'>
               <span
                 aria-label='Foody logo'
@@ -79,30 +79,54 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className='md:col-span-2'>
-            <div className='grid grid-cols-2 gap-x-2xl gap-y-2xl'>
-              <FooterLinkColumn
-                title='Explore'
-                links={[
-                  { label: 'All Food', href: '#' },
-                  { label: 'Nearby', href: '#' },
-                  { label: 'Discount', href: '#' },
-                  { label: 'Best Seller', href: '#' },
-                  { label: 'Delivery', href: '#' },
-                  { label: 'Lunch', href: '#' },
-                ]}
-              />
-              <FooterLinkColumn
-                title='Help'
-                links={[
-                  { label: 'How to Order', href: '#' },
-                  { label: 'Payment Methods', href: '#' },
-                  { label: 'Track My Order', href: '#' },
-                  { label: 'FAQ', href: '#' },
-                  { label: 'Contact Us', href: '#' },
-                ]}
-              />
-            </div>
+          <div className='grid grid-cols-2 gap-x-2xl gap-y-2xl md:hidden'>
+            <FooterLinkColumn
+              title='Explore'
+              links={[
+                { label: 'All Food', href: '#' },
+                { label: 'Nearby', href: '#' },
+                { label: 'Discount', href: '#' },
+                { label: 'Best Seller', href: '#' },
+                { label: 'Delivery', href: '#' },
+                { label: 'Lunch', href: '#' },
+              ]}
+            />
+            <FooterLinkColumn
+              title='Help'
+              links={[
+                { label: 'How to Order', href: '#' },
+                { label: 'Payment Methods', href: '#' },
+                { label: 'Track My Order', href: '#' },
+                { label: 'FAQ', href: '#' },
+                { label: 'Contact Us', href: '#' },
+              ]}
+            />
+          </div>
+
+          <div className='hidden md:block md:justify-self-center'>
+            <FooterLinkColumn
+              title='Explore'
+              links={[
+                { label: 'All Food', href: '#' },
+                { label: 'Nearby', href: '#' },
+                { label: 'Discount', href: '#' },
+                { label: 'Best Seller', href: '#' },
+                { label: 'Delivery', href: '#' },
+                { label: 'Lunch', href: '#' },
+              ]}
+            />
+          </div>
+          <div className='hidden md:block md:justify-self-end'>
+            <FooterLinkColumn
+              title='Help'
+              links={[
+                { label: 'How to Order', href: '#' },
+                { label: 'Payment Methods', href: '#' },
+                { label: 'Track My Order', href: '#' },
+                { label: 'FAQ', href: '#' },
+                { label: 'Contact Us', href: '#' },
+              ]}
+            />
           </div>
         </div>
       </Container>

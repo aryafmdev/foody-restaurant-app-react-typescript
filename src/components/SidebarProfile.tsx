@@ -26,7 +26,7 @@ export default function SidebarProfile({ name, onProfile, onDeliveryAddress, onM
         <div className="mt-4xl space-y-5xl">
           <button type="button" className="w-full inline-flex items-center gap-md" onClick={onProfile}>
             <Icon name="mdi:account-outline" size={24} className="text-neutral-900" />
-            <span className="text-md font-medium text-neutral-900">Profile</span>
+            <span className="text-md font-medium text-neutral-900 cursor-pointer">Profile</span>
           </button>
           <button type="button" className="w-full inline-flex items-center gap-md" onClick={onDeliveryAddress}>
             <Icon name="mdi:map-marker-outline" size={24} className="text-neutral-900" />
@@ -38,7 +38,7 @@ export default function SidebarProfile({ name, onProfile, onDeliveryAddress, onM
           </button>
           <button type="button" className="w-full inline-flex items-center gap-md" onClick={onLogout}>
             <img src={arrowLeft} alt="Logout" className="h-6 w-6" />
-            <span className="text-md font-medium text-neutral-900">Logout</span>
+            <span className="text-md font-medium text-neutral-900 cursor-pointer">Logout</span>
           </button>
         </div>
       </CardContent>

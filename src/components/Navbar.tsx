@@ -42,6 +42,8 @@ export default function Navbar({
     return () => window.removeEventListener('scroll', onScroll);
   }, [mode]);
 
+  const isAtTop = mode ? mode === 'top' : atTop;
+
   const { data: cart } = useCartQuery(userId, isLoggedIn);
   const { data: profile } = useProfileQuery(isLoggedIn);
 
@@ -54,7 +56,7 @@ export default function Navbar({
   const base = 'fixed top-0 left-0 right-0 z-50 transition-colors';
   const navClass = cn(
     base,
-    atTop
+    isAtTop
       ? 'bg-transparent text-white'
       : 'bg-white text-neutral-900 border-b border-neutral-200 shadow-sm'
   );
@@ -83,7 +85,7 @@ export default function Navbar({
             aria-label='Foody logo'
             className={cn(
               'inline-block h-8 w-8 md:h-6 md:w-6',
-              atTop ? 'bg-white' : 'bg-primary'
+              isAtTop ? 'bg-white' : 'bg-primary'
             )}
             style={
               {
@@ -101,7 +103,7 @@ export default function Navbar({
           <span
             className={cn(
               'font-extrabold md:text-display-md hidden md:inline',
-              atTop ? 'text-white' : 'text-neutral-900'
+              isAtTop ? 'text-white' : 'text-neutral-900'
             )}
           >
             Foody
@@ -119,8 +121,8 @@ export default function Navbar({
             >
               <Icon
                 name='lets-icons:bag-fill'
-                className={atTop ? 'text-white' : 'text-black'}
-                size={atTop ? 28 : 26}
+                className={isAtTop ? 'text-white' : 'text-black'}
+                size={isAtTop ? 28 : 26}
               />
               {cartCount > 0 ? (
                 <span className='absolute -top-1 -right-1 size-4.5 rounded-full bg-primary px-xxs text-sm leading-5 text-white text-center'>
@@ -138,21 +140,21 @@ export default function Navbar({
                 alt={displayName}
                 className='h-8 w-8 rounded-full'
               />
-              <span className='text-lg font-medium'>{displayName}</span>
+              <span className='text-lg font-medium hidden md:inline'>{displayName}</span>
             </button>
           </div>
         ) : (
           <div className='flex items-center gap-sm'>
             <Button
-              variant={atTop ? 'ghost' : 'outline'}
-              className={atTop ? btnOutlineTop : undefined}
+              variant={isAtTop ? 'ghost' : 'outline'}
+              className={isAtTop ? btnOutlineTop : undefined}
               onClick={() => navigate('/login')}
             >
               Sign In
             </Button>
             <Button
-              variant={atTop ? 'neutral' : 'primary'}
-              className={atTop ? btnSolidTop : undefined}
+              variant={isAtTop ? 'neutral' : 'primary'}
+              className={isAtTop ? btnSolidTop : undefined}
               onClick={() => navigate('/login?tab=signup')}
             >
               Sign Up

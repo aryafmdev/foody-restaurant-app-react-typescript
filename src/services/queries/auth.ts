@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { http } from '../api/http';
 import { z } from 'zod';
 import { UserSchema } from '../../types/schemas';
@@ -13,7 +13,7 @@ const LoginResponseSchema = z.object({
   data: z.object({ user: UserSchema, token: z.string() }),
 });
 
-const ProfileResponseSchema = z.object({ success: z.boolean(), data: UserSchema });
+const ProfileResponseSchema = z.object({ success: z.boolean(), message: z.string().optional(), data: UserSchema });
 
 export function useRegisterMutation() {
   return useMutation({
@@ -41,14 +41,19 @@ export function useProfileQuery(enabled: boolean = true) {
       return ProfileResponseSchema.parse(res.data);
     },
     enabled,
+    retry: false,
   });
 }
 
 export function useUpdateProfileMutation() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (body: { name?: string; phone?: string; currentPassword?: string; newPassword?: string }) => {
       const res = await http.put('/api/auth/profile', body);
       return ProfileResponseSchema.parse(res.data);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['auth', 'profile'] });
     },
   });
 }
