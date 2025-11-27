@@ -113,11 +113,22 @@ export default function Login() {
       const userId = String(res.data.user.id);
       dispatch(setToken(token));
       dispatch(setUserId(userId));
+      try {
+        sessionStorage.setItem('auth', JSON.stringify({ token, userId }));
+      } catch {
+        void 0;
+      }
       if (remember) {
         try {
           localStorage.setItem('auth', JSON.stringify({ token, userId }));
         } catch {
-          sessionStorage.setItem('auth', JSON.stringify({ token, userId }));
+          void 0;
+        }
+      } else {
+        try {
+          localStorage.removeItem('auth');
+        } catch {
+          void 0;
         }
       }
       showToast(

@@ -4,6 +4,7 @@ export { default as ProductCard } from './ProductCard';
 export { default as SearchBar } from './SearchBar';
 export { default as FilterBar } from './FilterBar';
 export { default as CategoryChipGroup } from './CategoryChipGroup';
+export { default as CategoryCard } from './CategoryCard';
 export { default as IconActionBar } from './IconActionBar';
 export { default as RatingGroup } from './RatingGroup';
 export { default as PriceWithBadge } from './PriceWithBadge';

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../app/store';
 import logo from '../assets/images/logo.png';
 import avatarImg from '../assets/images/avatar.png';
@@ -12,6 +12,11 @@ import { Icon } from '../ui/icon';
 import { useCartQuery } from '../services/queries/cart';
 import { useProfileQuery } from '../services/queries/auth';
 import { cn } from '../lib/cn';
+import { Dialog, DialogContent, DialogClose } from '../ui/dialog';
+import SidebarProfile from './SidebarProfile';
+import { setToken, setUserId } from '../features/auth/slice';
+import { useQueryClient } from '@tanstack/react-query';
+import { clear as clearCart } from '../features/cart/slice';
 
 type NavbarProps = {
   mode?: 'top' | 'scrolled';
@@ -46,16 +51,32 @@ export default function Navbar({
       : cart?.data?.summary?.totalItems ?? 0;
   const displayName = profile?.data?.name ?? 'John Doe';
 
-  const navClass = atTop
-    ? 'bg-transparent text-white'
-    : 'bg-white text-neutral-900 border border-neutral-200 shadow-sm';
+  const base = 'fixed top-0 left-0 right-0 z-50 transition-colors';
+  const navClass = cn(
+    base,
+    atTop
+      ? 'bg-transparent text-white'
+      : 'bg-white text-neutral-900 border-b border-neutral-200 shadow-sm'
+  );
   const btnOutlineTop = 'border border-white text-white hover:bg-white/10';
   const btnSolidTop = 'bg-white text-neutral-900 hover:opacity-95';
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const qc = useQueryClient();
+  const [profileOpen, setProfileOpen] = useState(false);
 
+  const navRef = useRef<HTMLElement | null>(null);
+  const [navHeight, setNavHeight] = useState<number>(() =>
+    typeof window !== 'undefined' && window.innerWidth >= 768 ? 64 : 56
+  );
+  useEffect(() => {
+    const onResize = () => setNavHeight(window.innerWidth >= 768 ? 64 : 56);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   return (
-    <nav className={navClass}>
+    <nav className={navClass} ref={navRef}>
       <Container className='flex items-center justify-between py-sm md:py-md'>
         <Link to='/' className='inline-flex items-center gap-sm'>
           <span
@@ -79,7 +100,7 @@ export default function Navbar({
           />
           <span
             className={cn(
-              'font-extrabold hidden md:inline',
+              'font-extrabold md:text-display-md hidden md:inline',
               atTop ? 'text-white' : 'text-neutral-900'
             )}
           >
@@ -107,14 +128,18 @@ export default function Navbar({
                 </span>
               ) : null}
             </IconButton>
-            <div className='inline-flex items-center gap-sm'>
+            <button
+              type='button'
+              className='inline-flex items-center gap-sm cursor-pointer'
+              onClick={() => setProfileOpen(true)}
+            >
               <img
                 src={avatarImg}
                 alt={displayName}
                 className='h-8 w-8 rounded-full'
               />
-              <span className='text-sm font-medium'>{displayName}</span>
-            </div>
+              <span className='text-lg font-medium'>{displayName}</span>
+            </button>
           </div>
         ) : (
           <div className='flex items-center gap-sm'>
@@ -135,6 +160,49 @@ export default function Navbar({
           </div>
         )}
       </Container>
+
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent side='right' offsetTop={navHeight}>
+          <SidebarProfile
+            name={displayName}
+            onProfile={() => {
+              setProfileOpen(false);
+              navigate('/profile');
+            }}
+            onDeliveryAddress={() => {
+              setProfileOpen(false);
+              navigate('/address');
+            }}
+            onMyOrders={() => {
+              setProfileOpen(false);
+              navigate('/orders');
+            }}
+            onLogout={() => {
+              setProfileOpen(false);
+              try {
+                sessionStorage.removeItem('auth');
+              } catch {
+                void 0;
+              }
+              try {
+                localStorage.removeItem('auth');
+              } catch {
+                void 0;
+              }
+              dispatch(setToken(null));
+              dispatch(setUserId(null));
+              dispatch(clearCart());
+              qc.clear();
+              navigate('/login');
+            }}
+          />
+          <div className='mt-xl text-right'>
+            <DialogClose asChild>
+              <Button variant='neutral'>Close</Button>
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
     </nav>
   );
 }
