@@ -12,7 +12,7 @@ import { Icon } from '../ui/icon';
 import { useCartQuery } from '../services/queries/cart';
 import { useProfileQuery } from '../services/queries/auth';
 import { cn } from '../lib/cn';
-import { Dialog, DialogContent, DialogClose } from '../ui/dialog';
+import { Dialog, DialogContent } from '../ui/dialog';
 import SidebarProfile from './SidebarProfile';
 import { setToken, setUserId } from '../features/auth/slice';
 import { useQueryClient } from '@tanstack/react-query';
@@ -73,20 +73,31 @@ export default function Navbar({
   const [navHeight, setNavHeight] = useState<number>(() =>
     typeof window !== 'undefined' && window.innerWidth >= 768 ? 64 : 56
   );
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : true
+  );
   useEffect(() => {
-    const onResize = () => setNavHeight(window.innerWidth >= 768 ? 64 : 56);
+    const onResize = () => {
+      const w = window.innerWidth;
+      setNavHeight(w >= 768 ? 64 : 56);
+      setIsMobile(w < 768);
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
   return (
     <nav className={navClass} ref={navRef}>
       <Container className='flex items-center justify-between py-sm md:py-md'>
-        <Link to='/' className='inline-flex items-center gap-sm' onClick={(e) => {
-          if (location.pathname === '/') {
-            e.preventDefault();
-            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-          }
-        }}>
+        <Link
+          to='/'
+          className='inline-flex items-center gap-sm'
+          onClick={(e) => {
+            if (location.pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            }
+          }}
+        >
           <span
             aria-label='Foody logo'
             className={cn(
@@ -127,7 +138,11 @@ export default function Navbar({
             >
               <Icon
                 name='lets-icons:bag-fill'
-                className={isAtTop ? 'text-white cursor-pointer' : 'text-black cursor-pointer'}
+                className={
+                  isAtTop
+                    ? 'text-white cursor-pointer'
+                    : 'text-black cursor-pointer'
+                }
                 size={isAtTop ? 28 : 26}
               />
               {cartCount > 0 ? (
@@ -146,7 +161,9 @@ export default function Navbar({
                 alt={displayName}
                 className='h-8 w-8 rounded-full'
               />
-              <span className='text-lg font-medium hidden md:inline'>{displayName}</span>
+              <span className='text-lg font-medium hidden md:inline'>
+                {displayName}
+              </span>
             </button>
           </div>
         ) : (
@@ -170,7 +187,7 @@ export default function Navbar({
       </Container>
 
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent side='right' offsetTop={navHeight}>
+        <DialogContent side='right' offsetTop={isMobile ? 0 : navHeight}>
           <SidebarProfile
             name={displayName}
             onProfile={() => {
@@ -204,11 +221,6 @@ export default function Navbar({
               navigate('/login');
             }}
           />
-          <div className='mt-xl text-right'>
-            <DialogClose asChild>
-              <Button variant='neutral'>Close</Button>
-            </DialogClose>
-          </div>
         </DialogContent>
       </Dialog>
     </nav>
