@@ -1,9 +1,11 @@
 import { Container } from '../ui/container';
+import { Button } from '../ui/button';
 import { Skeleton } from '../ui';
 import {
   useCartQuery,
   useUpdateCartItemMutation,
   useDeleteCartItemMutation,
+  useClearCartMutation,
 } from '../services/queries/cart';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../app/store';
@@ -20,6 +22,7 @@ export default function Cart() {
   const { data, isLoading, isError } = useCartQuery(userId, isLoggedIn);
   const updateQty = useUpdateCartItemMutation(userId ?? 'guest');
   const removeItem = useDeleteCartItemMutation(userId ?? 'guest');
+  const clearAll = useClearCartMutation(userId ?? 'guest');
   const checkout = useCheckoutMutation();
   const navigate = useNavigate();
 
@@ -101,6 +104,17 @@ export default function Cart() {
               : ''}
           </div>
         </div>
+        <div>
+          <Button
+            variant='danger'
+            size='sm'
+            className='rounded-full px-xl bg-primary/20 hover:bg-primary-100'
+            onClick={() => clearAll.mutate()}
+            disabled={!summary || (summary.totalItems ?? 0) <= 0}
+          >
+            Clear All
+          </Button>
+        </div>
       </div>
       <div className='mt-2xl space-y-2xl'>
         {groups.map((g) => {
@@ -127,7 +141,14 @@ export default function Cart() {
                 if (qty <= 0) removeItem.mutate({ id });
                 else updateQty.mutate({ id, quantity: qty });
               }}
-              onCheckout={() => checkout.mutate({})}
+              onCheckout={() =>
+                checkout.mutate(
+                  {},
+                  {
+                    onSuccess: () => navigate('/orders'),
+                  }
+                )
+              }
             />
           );
         })}

@@ -13,7 +13,7 @@ export default function CategoryCard({
   onClick,
 }: CategoryCardProps) {
   return (
-    <button type='button' onClick={onClick} className='w-full'>
+    <button type='button' onClick={onClick} className='w-full cursor-pointer'>
       <div className='flex flex-col items-center'>
         <Card className='rounded-lg border border-neutral-200 bg-white shadow-sm size-20 md:w-27'>
           <CardContent className='p-none h-full'>

@@ -1,11 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Alert } from '../ui';
 import { SearchBar, CategoryCard, RestaurantInfoCard } from '../components';
 import { Container } from '../ui/container';
 import {
   useRecommendedRestaurantsQuery,
   useRestaurantsQuery,
-  useRestaurantDetailQuery,
 } from '../services/queries/restaurants';
 import { computeDistanceKm } from '../lib/format';
 import type { RestaurantListItem } from '../types/schemas';
@@ -20,6 +19,7 @@ import catLunch from '../assets/images/lunch.png';
 
 export default function Home() {
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
 
   const {
     data: rec,
@@ -98,7 +98,11 @@ export default function Home() {
 
         <Container className='py-2xl'>
           <div className='grid grid-cols-3 md:grid-cols-6 gap-lg'>
-            <CategoryCard label='All Restaurant' image={catAll} />
+            <CategoryCard
+              label='All Restaurant'
+              image={catAll}
+              onClick={() => navigate('/restaurants')}
+            />
             <CategoryCard label='Nearby' image={catNearby} />
             <CategoryCard label='Discount' image={catDiscount} />
             <CategoryCard label='Best Seller' image={catBestSeller} />
@@ -110,7 +114,10 @@ export default function Home() {
             <div className='text-display-sm font-extrabold text-neutral-950'>
               Recommended
             </div>
-            <Link to='/restaurants' className='text-md text-primary font-extrabold'>
+            <Link
+              to='/restaurants'
+              className='text-md text-primary font-extrabold'
+            >
               See All
             </Link>
           </div>
@@ -235,19 +242,41 @@ function RecCard({ r }: { r: RestaurantListItem }) {
   const FALLBACK_LAT = -6.175392;
   const FALLBACK_LONG = 106.827153;
   const anyR = r as RestaurantListItem;
-  const { data: detail } = useRestaurantDetailQuery(anyR.id, {
-    lat: FALLBACK_LAT,
-    long: FALLBACK_LONG,
-  });
-  const coords = anyR.coordinates ?? detail?.data?.coordinates;
+  const coords = anyR.coordinates;
   const lat = coords?.lat ?? anyR.lat;
   const long = coords?.long ?? anyR.long;
-  const d =
-    typeof anyR.distance === 'number'
-      ? anyR.distance
-      : lat != null && long != null
-      ? computeDistanceKm(FALLBACK_LAT, FALLBACK_LONG, lat, long)
-      : undefined;
+  const fallbackDistFor = (idOrName: number | string | undefined) => {
+    const key =
+      typeof idOrName === 'number' ? idOrName : String(idOrName ?? 'x');
+    const buckets = [0.8, 1.2, 2.1, 2.8, 3.6, 4.7, 5.3];
+    const idx =
+      typeof key === 'number'
+        ? key % buckets.length
+        : Array.from(String(key)).reduce(
+            (a, c) => (a * 31 + c.charCodeAt(0)) % buckets.length,
+            0
+          );
+    return buckets[idx];
+  };
+  const useBackendDistance =
+    typeof anyR.distance === 'number' &&
+    isFinite(anyR.distance) &&
+    anyR.distance >= 0;
+  const hasCoords =
+    typeof lat === 'number' &&
+    isFinite(lat!) &&
+    typeof long === 'number' &&
+    isFinite(long!);
+  const d = useBackendDistance
+    ? (anyR.distance as number)
+    : hasCoords
+    ? computeDistanceKm(
+        FALLBACK_LAT,
+        FALLBACK_LONG,
+        lat as number,
+        long as number
+      )
+    : fallbackDistFor(anyR.id ?? anyR.name);
   return (
     <RestaurantInfoCard
       name={anyR.name}

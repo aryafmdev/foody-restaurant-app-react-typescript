@@ -138,6 +138,7 @@ export default function Profile() {
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}
               onLogout={() => navigate('/login')}
+              insideDialog={false}
               className='w-full md:w-[240px]'
             />
           </div>

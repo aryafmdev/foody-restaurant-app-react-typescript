@@ -12,6 +12,7 @@ type SidebarProfileProps = {
   onMyOrders?: () => void;
   onLogout?: () => void;
   className?: string;
+  insideDialog?: boolean;
 };
 
 export default function SidebarProfile({
@@ -21,6 +22,7 @@ export default function SidebarProfile({
   onMyOrders,
   onLogout,
   className,
+  insideDialog = true,
 }: SidebarProfileProps) {
   return (
     <Card
@@ -41,20 +43,22 @@ export default function SidebarProfile({
           <div className='flex-1 text-lg font-bold text-neutral-950'>
             {name}
           </div>
-          <DialogClose asChild>
-            <IconButton
-              aria-label='Close'
-              size='sm'
-              variant='neutral'
-              className='rounded-full'
-            >
-              <Icon
-                name='iconamoon:close'
-                size={20}
-                className='text-neutral-900 cursor-pointer'
-              />
-            </IconButton>
-          </DialogClose>
+          {insideDialog ? (
+            <DialogClose asChild>
+              <IconButton
+                aria-label='Close'
+                size='sm'
+                variant='neutral'
+                className='rounded-full cursor-pointer'
+              >
+                <Icon
+                  name='iconamoon:close'
+                  size={20}
+                  className='text-neutral-900 cursor-pointer'
+                />
+              </IconButton>
+            </DialogClose>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent className='p-2xl pt-none'>
@@ -62,13 +66,13 @@ export default function SidebarProfile({
         <div className='mt-4xl space-y-5xl'>
           <button
             type='button'
-            className='w-full inline-flex items-center gap-md'
+            className='w-full inline-flex items-center gap-md cursor-pointer'
             onClick={onProfile}
           >
             <Icon
               name='mdi:account-outline'
               size={24}
-              className='text-neutral-900'
+              className='text-neutral-900 cursor-pointer'
             />
             <span className='text-md font-medium text-neutral-900 cursor-pointer'>
               Profile
@@ -90,21 +94,21 @@ export default function SidebarProfile({
           </button>
           <button
             type='button'
-            className='w-full inline-flex items-center gap-md'
+            className='w-full inline-flex items-center gap-md cursor-pointer'
             onClick={onMyOrders}
           >
             <Icon
               name='akar-icons:file'
               size={24}
-              className='text-neutral-900'
+              className='text-neutral-900 cursor-pointer'
             />
-            <span className='text-md font-medium text-neutral-900'>
+            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
               My Orders
             </span>
           </button>
           <button
             type='button'
-            className='w-full inline-flex items-center gap-md'
+            className='w-full inline-flex items-center gap-md cursor-pointer'
             onClick={onLogout}
           >
             <img src={arrowLeft} alt='Logout' className='h-6 w-6' />
