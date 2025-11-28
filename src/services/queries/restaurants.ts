@@ -93,3 +93,57 @@ export function useRestaurantDetailQuery(
     enabled: !!id,
   });
 }
+
+export function useAllRestaurantsQuery(params?: {
+  q?: string;
+  priceMin?: number;
+  priceMax?: number;
+  rating?: number;
+  lat?: number;
+  long?: number;
+}) {
+  return useQuery({
+    queryKey: ['restaurants', 'all', params ?? {}],
+    queryFn: async () => {
+      const first = await http.get('/api/resto', {
+        params: {
+          page: 1,
+          limit: 24,
+          ...params,
+          lat: params?.lat ?? FALLBACK_LAT,
+          long: params?.long ?? FALLBACK_LONG,
+        },
+      });
+      const parsedFirst = RestaurantListResponseSchema.parse(first.data);
+      const pag = parsedFirst.data.pagination;
+      const totalPages = pag?.totalPages ?? 1;
+      const limit = pag?.limit ?? 24;
+      const acc = [...parsedFirst.data.restaurants];
+      for (let p = 2; p <= totalPages; p++) {
+        const res = await http.get('/api/resto', {
+          params: {
+            page: p,
+            limit,
+            ...params,
+            lat: params?.lat ?? FALLBACK_LAT,
+            long: params?.long ?? FALLBACK_LONG,
+          },
+        });
+        const parsed = RestaurantListResponseSchema.parse(res.data);
+        acc.push(...parsed.data.restaurants);
+      }
+      return RestaurantListResponseSchema.parse({
+        success: true,
+        data: {
+          restaurants: acc,
+          pagination: {
+            page: 1,
+            limit,
+            total: pag?.total ?? acc.length,
+            totalPages: 1,
+          },
+        },
+      });
+    },
+  });
+}
