@@ -22,3 +22,4 @@ export { default as MapPinChip } from './MapPinChip';
 export { default as FooterLinkColumn } from './FooterLinkColumn';
 export { default as AddressSummaryRow } from './AddressSummaryRow';
 export { default as OrderSummary } from './OrderSummary';
+export { default as StickyCheckoutBar } from './StickyCheckoutBar';

@@ -1,5 +1,6 @@
 import { cn } from '../lib/cn'
 import { Image } from '../ui/image'
+import fallbackImg from '../assets/images/fallback-image.png'
 import { Button } from '../ui/button'
 import { Icon } from '../ui/icon'
 import { formatCurrency } from '../lib/format'
@@ -31,7 +32,7 @@ export default function CartItemRow({
     <div className={cn('flex items-center justify-between', className)}>
       <div className='flex items-center gap-md'>
         <div className='h-16 w-16 rounded-lg overflow-hidden bg-neutral-200'>
-          <Image alt={title} src={imageUrl || ''} className='h-full w-full' />
+          <Image alt={title} src={imageUrl || fallbackImg} fallbackSrc={fallbackImg} className='h-full w-full' />
         </div>
         <div>
           <div className='text-md text-neutral-900'>{title}</div>

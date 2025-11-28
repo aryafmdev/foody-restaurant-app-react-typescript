@@ -5,7 +5,10 @@ import { Container } from '../ui/container';
 import {
   useRecommendedRestaurantsQuery,
   useRestaurantsQuery,
+  useRestaurantDetailQuery,
 } from '../services/queries/restaurants';
+import { computeDistanceKm } from '../lib/format';
+import type { RestaurantListItem } from '../types/schemas';
 import { useState, useRef } from 'react';
 import heroImg from '../assets/images/hero-image.png';
 import catAll from '../assets/images/all-restaurant.png';
@@ -66,16 +69,16 @@ export default function Home() {
           <img
             src={heroImg}
             alt='Foody hero'
-            className='h-[320px] md:h-[420px] w-full object-cover'
+            className='h-[648px] md:h-[420px] w-full object-cover'
           />
           <div className='absolute inset-0 bg-black/50' />
           <div className='absolute inset-0 flex items-center justify-center'>
             <Container>
               <div className='mx-auto max-w-[720px] text-center'>
-                <h1 className='text-display-2xl leading-display-2xl font-extrabold text-white'>
+                <h1 className='text-display-lg md:text-display-2xl leading-display-2xl font-extrabold text-white'>
                   Explore Culinary Experiences
                 </h1>
-                <p className='mt-xs text-display-xs font-bold text-white'>
+                <p className='mt-xs text-lg md:text-display-xs font-bold text-white'>
                   Search and refine your choice to discover the perfect
                   restaurant.
                 </p>
@@ -85,7 +88,7 @@ export default function Home() {
                     onChange={setSearch}
                     onSubmit={onSearchSubmit}
                     placeholder='Search restaurants, food and drink'
-                    className='mx-auto w-[604px] [&>input]:h-[56px]'
+                    className='mx-auto text-sm w-[349px] md:w-[604px] [&>input]:h-[48px]'
                   />
                 </div>
               </div>
@@ -107,7 +110,7 @@ export default function Home() {
             <div className='text-display-sm font-extrabold text-neutral-950'>
               Recommended
             </div>
-            <Link to='/restaurants' className='text-md text-primary'>
+            <Link to='/restaurants' className='text-md text-primary font-extrabold'>
               See All
             </Link>
           </div>
@@ -146,17 +149,7 @@ export default function Home() {
                         to={`/restaurant/${r.id}`}
                         className='block'
                       >
-                        <RestaurantInfoCard
-                          name={r.name}
-                          logo={r.logo}
-                          place={r.place}
-                          distanceKm={
-                            typeof r.distance === 'number'
-                              ? r.distance
-                              : undefined
-                          }
-                          rating={typeof r.star === 'number' ? r.star : 0}
-                        />
+                        <RecCard r={r} />
                       </Link>
                     ))}
                     {fallbackItems.map((f) => (
@@ -225,17 +218,7 @@ export default function Home() {
                           to={`/restaurant/${r.id}`}
                           className='block'
                         >
-                          <RestaurantInfoCard
-                            name={r.name}
-                            logo={r.logo}
-                            place={r.place}
-                            distanceKm={
-                              typeof r.distance === 'number'
-                                ? r.distance
-                                : undefined
-                            }
-                            rating={typeof r.star === 'number' ? r.star : 0}
-                          />
+                          <RecCard r={r} />
                         </Link>
                       ))}
                 </div>
@@ -245,5 +228,33 @@ export default function Home() {
         </Container>
       </div>
     </>
+  );
+}
+
+function RecCard({ r }: { r: RestaurantListItem }) {
+  const FALLBACK_LAT = -6.175392;
+  const FALLBACK_LONG = 106.827153;
+  const anyR = r as RestaurantListItem;
+  const { data: detail } = useRestaurantDetailQuery(anyR.id, {
+    lat: FALLBACK_LAT,
+    long: FALLBACK_LONG,
+  });
+  const coords = anyR.coordinates ?? detail?.data?.coordinates;
+  const lat = coords?.lat ?? anyR.lat;
+  const long = coords?.long ?? anyR.long;
+  const d =
+    typeof anyR.distance === 'number'
+      ? anyR.distance
+      : lat != null && long != null
+      ? computeDistanceKm(FALLBACK_LAT, FALLBACK_LONG, lat, long)
+      : undefined;
+  return (
+    <RestaurantInfoCard
+      name={anyR.name}
+      logo={anyR.logo}
+      place={anyR.place}
+      distanceKm={d}
+      rating={anyR.star}
+    />
   );
 }

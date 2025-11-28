@@ -181,6 +181,9 @@ export const RestaurantListItemSchema = z.object({
   menuCount: z.number().optional(),
   priceRange: z.object({ min: z.number(), max: z.number() }).optional(),
   distance: z.number().optional(),
+  coordinates: z.object({ lat: z.number(), long: z.number() }).optional(),
+  lat: z.number().optional(),
+  long: z.number().optional(),
 });
 
 export type RestaurantListItem = z.infer<typeof RestaurantListItemSchema>;
