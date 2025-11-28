@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
 import { formatCurrency } from '../lib/format';
 import fallbackImg from '../assets/images/fallback-image.png';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image } from '../ui/image';
 
 type ProductCardProps = {
@@ -22,6 +22,9 @@ export default function ProductCard({
   onQuantityChange,
 }: ProductCardProps) {
   const [qty, setQty] = useState<number>(initialQty);
+  useEffect(() => {
+    setQty(initialQty);
+  }, [initialQty]);
   const img = imageUrl ?? fallbackImg;
   const add = () => {
     const next = qty > 0 ? qty : 1;

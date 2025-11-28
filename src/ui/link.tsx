@@ -11,5 +11,5 @@ export function Link({ className, variant = 'default', ...props }: LinkProps) {
     muted: 'text-neutral-700 hover:text-neutral-900',
     underline: 'text-primary underline underline-offset-4',
   }[variant]
-  return <a className={cn('inline-flex items-center transition-colors', variants, className)} {...props} />
+  return <a className={cn('inline-flex items-center transition-colors cursor-pointer', variants, className)} {...props} />
 }

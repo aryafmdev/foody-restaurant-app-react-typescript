@@ -43,7 +43,7 @@ export function Checkbox({
   const iconSize = uiSize === 'sm' ? 14 : 16;
 
   return (
-    <label className={cn('relative inline-flex items-center', className)}>
+    <label className={cn('relative inline-flex items-center cursor-pointer', className)}>
       <input
         type='checkbox'
         ref={ref}

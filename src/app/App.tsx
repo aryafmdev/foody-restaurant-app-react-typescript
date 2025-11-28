@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Home from '../pages/Home';
+import Restaurants from '../pages/Restaurants';
 import Profile from '../pages/Profile';
 import Cart from '../pages/Cart';
 import Login from '../pages/Login';
@@ -24,9 +25,14 @@ export default function App() {
       {hideNav ? null : (
         <Navbar mode={location.pathname === '/' ? undefined : 'scrolled'} />
       )}
-      <main className={hideNav ? 'flex-1' : isHome ? 'flex-1' : 'pt-16 md:pt-20 flex-1'}>
+      <main
+        className={
+          hideNav ? 'flex-1' : isHome ? 'flex-1' : 'pt-16 md:pt-20 flex-1'
+        }
+      >
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/restaurants' element={<Restaurants />} />
           <Route path='/login' element={<Login />} />
           <Route path='/profile' element={<Profile />} />
           <Route path='/cart' element={<Cart />} />

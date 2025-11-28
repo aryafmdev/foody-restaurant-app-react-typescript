@@ -1,6 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { useRestaurantDetailQuery } from '../services/queries/restaurants';
-import { useAddToCartMutation, useCartQuery } from '../services/queries/cart';
+import {
+  useAddToCartMutation,
+  useCartQuery,
+  useUpdateCartItemMutation,
+  useDeleteCartItemMutation,
+  getPendingQty,
+} from '../services/queries/cart';
 import { Container } from '../ui/container';
 import { Image } from '../ui/image';
 import { Button } from '../ui/button';
@@ -19,6 +25,7 @@ import { formatPlaceAndDistance, computeDistanceKm } from '../lib/format';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../app/store';
 import { useNavigate } from 'react-router-dom';
+import type { GetCartResponse } from '../types/schemas';
 
 export default function RestaurantDetail() {
   const params = useParams();
@@ -31,12 +38,15 @@ export default function RestaurantDetail() {
     limitMenu: menuLimit,
     limitReview: reviewLimit,
   });
-  const addToCart = useAddToCartMutation();
   const userId = useSelector((s: RootState) => s.auth.userId);
+  const addToCart = useAddToCartMutation(userId ?? 'guest');
   const token = useSelector((s: RootState) => s.auth.token);
   const isLoggedIn = !!token;
   const { data: cart } = useCartQuery(userId, isLoggedIn);
-  const summary = cart?.data?.summary;
+  const updateQty = useUpdateCartItemMutation(userId ?? 'guest');
+  const removeItem = useDeleteCartItemMutation(userId ?? 'guest');
+  const cartData = cart as GetCartResponse | undefined;
+  const summary = cartData?.data?.summary;
   const navigate = useNavigate();
   const [localQty, setLocalQty] = useState<Record<number, number>>({});
 
@@ -253,6 +263,19 @@ export default function RestaurantDetail() {
                 title={m.foodName}
                 price={m.price}
                 imageUrl={m.image}
+                initialQty={(() => {
+                  if (!isLoggedIn) return localQty[m.id] ?? 0;
+                  const groups = (cartData?.data?.cart ??
+                    []) as GetCartResponse['data']['cart'];
+                  const group = groups.find(
+                    (g) => g.restaurant.id === resto.id
+                  );
+                  const existing = group?.items.find(
+                    (it) => it.menu.id === m.id
+                  );
+                  const p = getPendingQty(userId ?? 'guest', resto.id, m.id);
+                  return Math.max(existing?.quantity ?? 0, p);
+                })()}
                 onQuantityChange={(q) => {
                   setLocalQty((prev) => {
                     const next = { ...prev };
@@ -261,11 +284,42 @@ export default function RestaurantDetail() {
                     return next;
                   });
                   if (isLoggedIn) {
-                    addToCart.mutate({
-                      restaurantId: resto.id,
-                      menuId: m.id,
-                      quantity: q,
-                    });
+                    const groups = (cartData?.data?.cart ??
+                      []) as GetCartResponse['data']['cart'];
+                    const group = groups.find(
+                      (g) => g.restaurant.id === resto.id
+                    );
+                    const existing = group?.items.find(
+                      (it) => it.menu.id === m.id
+                    );
+                    if (!existing) {
+                      if (q > 0)
+                        addToCart.mutate({
+                          body: {
+                            restaurantId: resto.id,
+                            menuId: m.id,
+                            quantity: q,
+                          },
+                          optimistic: {
+                            restaurant: {
+                              id: resto.id,
+                              name: resto.name,
+                              logo: resto.logo ?? '',
+                            },
+                            menu: {
+                              id: m.id,
+                              foodName: m.foodName,
+                              price: m.price,
+                              type: m.type,
+                              image: m.image,
+                            },
+                            quantity: q,
+                          },
+                        });
+                    } else {
+                      if (q <= 0) removeItem.mutate({ id: existing.id });
+                      else updateQty.mutate({ id: existing.id, quantity: q });
+                    }
                   }
                 }}
               />

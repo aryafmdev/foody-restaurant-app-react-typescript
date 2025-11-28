@@ -27,7 +27,7 @@ export default function CartItemRow({
   className,
 }: CartItemRowProps) {
   const inc = () => onQuantityChange(quantity + 1)
-  const dec = () => onQuantityChange(Math.max(1, quantity - 1))
+  const dec = () => onQuantityChange(Math.max(0, quantity - 1))
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div className='flex items-center gap-md'>

@@ -26,7 +26,7 @@ export function IconButton({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center p-0 transition-colors disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center p-0 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none',
         sizes,
         variants,
         className

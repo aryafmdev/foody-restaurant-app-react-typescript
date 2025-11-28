@@ -12,5 +12,5 @@ export function Radio({ className, ...props }: Omit<InputHTMLAttributes<HTMLInpu
 }
 
 export function RadioLabel({ className, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
-  return <label className={cn('ml-sm text-sm text-neutral-900', className)} {...props} />
+  return <label className={cn('ml-sm text-sm text-neutral-900 cursor-pointer', className)} {...props} />
 }

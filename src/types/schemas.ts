@@ -75,7 +75,7 @@ export type CartSummary = z.infer<typeof CartSummarySchema>;
 export const GetCartResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
-    restaurants: z.array(CartGroupSchema),
+    cart: z.array(CartGroupSchema),
     summary: CartSummarySchema,
   }),
 });

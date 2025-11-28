@@ -15,7 +15,7 @@ export default function CategoryChipGroup({ items, onToggle, className, activeVa
   return (
     <div className={cn('flex flex-wrap items-center gap-sm', className)}>
       {items.map((it) => (
-        <button key={it.id} type="button" onClick={() => onToggle?.(it.id)} className="inline-flex">
+        <button key={it.id} type="button" onClick={() => onToggle?.(it.id)} className="inline-flex cursor-pointer">
           <Badge variant={it.active ? activeVariant : inactiveVariant} size={it.active ? activeSize : inactiveSize}>{it.label}</Badge>
         </button>
       ))}

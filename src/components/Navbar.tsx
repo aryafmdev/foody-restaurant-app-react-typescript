@@ -127,7 +127,7 @@ export default function Navbar({
             >
               <Icon
                 name='lets-icons:bag-fill'
-                className={isAtTop ? 'text-white' : 'text-black'}
+                className={isAtTop ? 'text-white cursor-pointer' : 'text-black cursor-pointer'}
                 size={isAtTop ? 28 : 26}
               />
               {cartCount > 0 ? (
