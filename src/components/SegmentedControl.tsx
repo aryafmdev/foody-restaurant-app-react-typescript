@@ -1,35 +1,47 @@
-import { cn } from '../lib/cn'
-import { Button } from '../ui/button'
+import { cn } from '../lib/cn';
+import { Button } from '../ui/button';
 
 type SegmentedControlProps = {
-  options: { label: string; value: string }[]
-  value: string
-  onChange: (value: string) => void
-  className?: string
-}
+  options: { label: string; value: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+  scrollable?: boolean;
+};
 
-export default function SegmentedControl({ options, value, onChange, className }: SegmentedControlProps) {
+export default function SegmentedControl({
+  options,
+  value,
+  onChange,
+  className,
+  scrollable = false,
+}: SegmentedControlProps) {
   return (
-    <div className={cn('inline-flex items-center gap-none rounded-sm bg-neutral-100 p-sm', className)}>
+    <div
+      className={cn(
+        'inline-flex items-center gap-md',
+        scrollable &&
+          'w-full overflow-x-auto whitespace-nowrap md:overflow-visible',
+        className
+      )}
+    >
       {options.map((opt) => {
-        const active = opt.value === value
+        const active = opt.value === value;
         return (
           <Button
             key={opt.value}
-            size="sm"
-            variant="ghost"
+            size='sm'
+            variant='ghost'
             className={cn(
-              'rounded-sm',
-              active
-                ? 'bg-white text-neutral-950 font-bold shadow-sm border border-neutral-300'
-                : 'bg-transparent text-neutral-500 font-medium hover:bg-neutral-100'
+              'rounded-full bg-white text-neutral-950 border border-neutral-300',
+              active ? 'border-none font-extrabold' : 'font-medium'
             )}
             onClick={() => onChange(opt.value)}
           >
             {opt.label}
           </Button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

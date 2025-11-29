@@ -18,6 +18,7 @@ type SuccessState = {
   deliveryFee?: number;
   serviceFee?: number;
   total?: number;
+  transaction?: import('../types/schemas').Transaction;
 };
 
 const PAYMENT_LABEL: Record<string, string> = {
@@ -31,21 +32,26 @@ export default function Success() {
   const navigate = useNavigate();
   const loc = useLocation();
   const state = (loc.state ?? {}) as SuccessState;
+  const tx = state.transaction;
   const itemsCount = state.itemsCount ?? 0;
   const subtotal = state.subtotal ?? 0;
   const deliveryFee = state.deliveryFee ?? 0;
   const serviceFee = state.serviceFee ?? 0;
   const total = state.total ?? subtotal + deliveryFee + serviceFee;
-  const createdAt = state.createdAt ?? new Date().toISOString();
-  const methodKey = String(state.paymentMethod ?? '').toLowerCase();
-  const paymentLabel = PAYMENT_LABEL[methodKey] ?? state.paymentMethod ?? '—';
+  const createdAt =
+    tx?.createdAt ?? state.createdAt ?? new Date().toISOString();
+  const methodKey = String(
+    tx?.paymentMethod ?? state.paymentMethod ?? ''
+  ).toLowerCase();
+  const paymentLabel =
+    PAYMENT_LABEL[methodKey] ?? tx?.paymentMethod ?? state.paymentMethod ?? '—';
 
   const formattedDate = dayjs(createdAt)
     .locale('id')
     .format('D MMMM YYYY, HH:mm');
 
   return (
-    <Container className='py-3xl'>
+    <Container className='h-screen flex flex-col items-center justify-center'>
       <div className='flex flex-col items-center'>
         <div className='inline-flex items-center gap-sm'>
           <span
@@ -71,7 +77,7 @@ export default function Success() {
 
         <Card
           className={cn(
-            'mt-2xl rounded-lg border-none shadow-md w-full md:w-[480px] bg-white'
+            'mt-2xl rounded-lg border-none w-full md:w-[480px] bg-white'
           )}
         >
           <CardContent className='p-xl space-y-2xl'>
@@ -150,7 +156,9 @@ export default function Success() {
                 variant='primary'
                 size='md'
                 className='w-full rounded-full h-12'
-                onClick={() => navigate('/orders')}
+                onClick={() =>
+                  navigate('/orders', { state: { transaction: tx } })
+                }
               >
                 See My Orders
               </Button>

@@ -347,7 +347,7 @@ export function useUpdateCartItemMutation(userKey?: string | null) {
   return useMutation<
     { success: boolean },
     Error,
-    { id: number; quantity: number },
+    { id: number; quantity: number; optimistic?: AddItemOptimistic },
     { previous?: GetCartResponse }
   >({
     mutationFn: async (payload) => {
@@ -374,10 +374,56 @@ export function useUpdateCartItemMutation(userKey?: string | null) {
             quantity: payload.quantity,
             ts: Date.now(),
           });
+        } else if (payload.optimistic) {
+          up(key, {
+            restaurantId: payload.optimistic.restaurant.id,
+            menuId: payload.optimistic.menu.id,
+            quantity: payload.quantity,
+            ts: Date.now(),
+          });
         }
+      } else if (payload.optimistic) {
+        up(key, {
+          restaurantId: payload.optimistic.restaurant.id,
+          menuId: payload.optimistic.menu.id,
+          quantity: payload.quantity,
+          ts: Date.now(),
+        });
       }
       qc.setQueryData<GetCartResponse | undefined>(['cart', key], (old) => {
-        if (!old) return old;
+        if (!old) {
+          if (!payload.optimistic) return old;
+          const item = {
+            id: Date.now(),
+            menu: {
+              id: payload.optimistic.menu.id,
+              foodName: payload.optimistic.menu.foodName,
+              price: payload.optimistic.menu.price,
+              type: payload.optimistic.menu.type ?? 'food',
+              image: payload.optimistic.menu.image ?? '',
+            },
+            quantity: payload.quantity,
+            itemTotal:
+              (payload.optimistic.menu.price ?? 0) * payload.quantity,
+          };
+          const nextCart = [
+            {
+              restaurant: payload.optimistic.restaurant,
+              items: [item],
+              subtotal: item.itemTotal,
+            },
+          ];
+          const summary = {
+            totalItems: nextCart.reduce(
+              (sum, g) =>
+                sum + g.items.reduce((s, it) => s + (it.quantity ?? 0), 0),
+              0
+            ),
+            totalPrice: nextCart.reduce((sum, g) => sum + (g.subtotal ?? 0), 0),
+            restaurantCount: nextCart.length,
+          };
+          return { success: true, data: { cart: nextCart, summary } };
+        }
         const nextCart = old.data.cart.map((group) => ({
           ...group,
           items: group.items.map((it) =>

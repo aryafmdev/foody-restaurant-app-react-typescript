@@ -11,11 +11,14 @@ import {
   useCartQuery,
   useUpdateCartItemMutation,
   useDeleteCartItemMutation,
+  useClearCartMutation,
 } from '../services/queries/cart';
 import { useCheckoutMutation } from '../services/queries/orders';
+import { putOrderHistory } from '../services/queries/orders';
 import { useProfileQuery } from '../services/queries/auth';
 import type { GetCartResponse } from '../types/schemas';
 import { MyCheckoutCard } from '../components';
+import type { Transaction } from '../types/schemas';
 
 export default function Checkout() {
   const token = useSelector((s: RootState) => s.auth.token);
@@ -25,6 +28,7 @@ export default function Checkout() {
   const { data, isLoading, isError } = useCartQuery(userId, isLoggedIn);
   const updateQty = useUpdateCartItemMutation(userId ?? 'guest');
   const removeItem = useDeleteCartItemMutation(userId ?? 'guest');
+  const clearCart = useClearCartMutation(userId ?? 'guest');
   const checkout = useCheckoutMutation();
   const { data: profile } = useProfileQuery(isLoggedIn);
 
@@ -143,14 +147,48 @@ export default function Checkout() {
           deliveryFee={deliveryFee}
           serviceFee={serviceFee}
           total={grandTotal}
+          buying={checkout.isPending}
+          buyingLabel='Buying...'
           onBuy={() =>
             checkout.mutate(
               { paymentMethod: payment },
               {
                 onSuccess: (res) => {
                   const tx = res?.data?.transaction;
+                  const restaurantsOptimistic = groups.map((g) => ({
+                    restaurant: {
+                      id: g.restaurant.id,
+                      name: g.restaurant.name,
+                      logo: g.restaurant.logo,
+                    },
+                    items: g.items.map((it) => ({
+                      menuId: it.menu.id,
+                      menuName: it.menu.foodName,
+                      price: it.menu.price,
+                      quantity: it.quantity,
+                      itemTotal: it.itemTotal,
+                    })),
+                    subtotal: g.subtotal,
+                  }));
+                  const optimisticTx: Transaction = {
+                    id: tx?.id,
+                    transactionId: tx?.transactionId ?? `TRX-${Date.now()}`,
+                    paymentMethod: tx?.paymentMethod ?? payment,
+                    status: tx?.status ?? 'preparing',
+                    restaurants: restaurantsOptimistic,
+                    pricing: {
+                      subtotal,
+                      serviceFee,
+                      deliveryFee,
+                      totalPrice: grandTotal,
+                    },
+                    createdAt: tx?.createdAt ?? new Date().toISOString(),
+                  };
+                  putOrderHistory(userId ?? 'guest', optimisticTx);
+                  clearCart.mutate();
                   navigate('/success', {
                     state: {
+                      transaction: optimisticTx,
                       paymentMethod: tx?.paymentMethod ?? payment,
                       createdAt: tx?.createdAt ?? new Date().toISOString(),
                       itemsCount: summary?.totalItems ?? 0,

@@ -1,5 +1,6 @@
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
+import { Spinner } from '../ui/spinner';
 import { cn } from '../lib/cn';
 import { formatCurrency } from '../lib/format';
 import bniImg from '../assets/images/bni.png';
@@ -20,6 +21,8 @@ type PaymentMethodCardProps = {
   total?: number;
   buyLabel?: string;
   onBuy?: () => void;
+  buying?: boolean;
+  buyingLabel?: string;
   className?: string;
 };
 
@@ -46,12 +49,12 @@ export default function PaymentMethodCard({
   total = subtotal + deliveryFee + serviceFee,
   buyLabel = 'Buy',
   onBuy,
+  buying = false,
+  buyingLabel = 'Buying...',
   className,
 }: PaymentMethodCardProps) {
   return (
-    <Card
-      className={cn('rounded-lg border-none bg-white', className)}
-    >
+    <Card className={cn('rounded-lg border-none bg-white', className)}>
       <CardContent className='p-2xl space-y-lg'>
         <div className='text-md font-bold text-neutral-950'>{title}</div>
         <div className='space-y-sm'>
@@ -121,8 +124,16 @@ export default function PaymentMethodCard({
               size='md'
               className='w-full rounded-full h-12'
               onClick={onBuy}
+              disabled={buying}
             >
-              {buyLabel}
+              {buying ? (
+                <span className='inline-flex items-center gap-xs'>
+                  <Spinner size={16} />
+                  <span>{buyingLabel}</span>
+                </span>
+              ) : (
+                buyLabel
+              )}
             </Button>
           </div>
         ) : null}

@@ -318,7 +318,26 @@ export default function RestaurantDetail() {
                         });
                     } else {
                       if (q <= 0) removeItem.mutate({ id: existing.id });
-                      else updateQty.mutate({ id: existing.id, quantity: q });
+                      else
+                        updateQty.mutate({
+                          id: existing.id,
+                          quantity: q,
+                          optimistic: {
+                            restaurant: {
+                              id: resto.id,
+                              name: resto.name,
+                              logo: resto.logo ?? '',
+                            },
+                            menu: {
+                              id: m.id,
+                              foodName: m.foodName,
+                              price: m.price,
+                              type: m.type,
+                              image: m.image,
+                            },
+                            quantity: q,
+                          },
+                        });
                     }
                   }
                 }}
