@@ -10,7 +10,6 @@ import {
 import { useSelector } from 'react-redux';
 import type { RootState } from '../app/store';
 import MyCartCard from '../components/MyCartCard';
-import { useCheckoutMutation } from '../services/queries/orders';
 import { Alert } from '../ui/alert';
 import { useNavigate } from 'react-router-dom';
 import type { GetCartResponse } from '../types/schemas';
@@ -23,7 +22,6 @@ export default function Cart() {
   const updateQty = useUpdateCartItemMutation(userId ?? 'guest');
   const removeItem = useDeleteCartItemMutation(userId ?? 'guest');
   const clearAll = useClearCartMutation(userId ?? 'guest');
-  const checkout = useCheckoutMutation();
   const navigate = useNavigate();
 
   if (!isLoggedIn) {
@@ -141,14 +139,7 @@ export default function Cart() {
                 if (qty <= 0) removeItem.mutate({ id });
                 else updateQty.mutate({ id, quantity: qty });
               }}
-              onCheckout={() =>
-                checkout.mutate(
-                  {},
-                  {
-                    onSuccess: () => navigate('/orders'),
-                  }
-                )
-              }
+              onCheckout={() => navigate('/checkout')}
             />
           );
         })}

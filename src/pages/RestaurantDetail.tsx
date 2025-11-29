@@ -404,7 +404,7 @@ export default function RestaurantDetail() {
           <StickyCheckoutBar
             itemsCount={itemsCount}
             totalPrice={totalPrice}
-            onCheckout={() => navigate(isLoggedIn ? '/cart' : '/login')}
+            onCheckout={() => navigate(isLoggedIn ? '/checkout' : '/login')}
             iconName='lets-icons:bag-fill'
             visible={showLogged || showGuest}
             showOnMobileOnly

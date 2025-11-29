@@ -23,3 +23,6 @@ export { default as FooterLinkColumn } from './FooterLinkColumn';
 export { default as AddressSummaryRow } from './AddressSummaryRow';
 export { default as OrderSummary } from './OrderSummary';
 export { default as StickyCheckoutBar } from './StickyCheckoutBar';
+export { default as MyCheckoutCard } from './MyCheckoutCard';
+export { default as DeliveryAddressCard } from './DeliveryAddressCard';
+export { default as PaymentMethodCard } from './PaymentMethodCard';

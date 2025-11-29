@@ -9,6 +9,8 @@ import RestaurantDetail from '../pages/RestaurantDetail';
 import AtomsPreview from '../pages/AtomsPreview';
 import MoleculesPreview from '../pages/MoleculesPreview';
 import HeaderPreview from '../pages/HeaderPreview';
+import MyOrders from '../pages/MyOrders';
+import Checkout from '../pages/Checkout';
 import { Navbar, Footer } from '../components';
 
 export default function App() {
@@ -21,7 +23,7 @@ export default function App() {
     }
   }, [location.pathname]);
   return (
-    <div className='min-h-screen bg-white text-neutral-900 flex flex-col'>
+    <div className='min-h-screen bg-neutral-50 text-neutral-900 flex flex-col'>
       {hideNav ? null : (
         <Navbar mode={location.pathname === '/' ? undefined : 'scrolled'} />
       )}
@@ -36,6 +38,8 @@ export default function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/profile' element={<Profile />} />
           <Route path='/cart' element={<Cart />} />
+          <Route path='/checkout' element={<Checkout />} />
+          <Route path='/orders' element={<MyOrders />} />
           <Route path='/restaurant/:id' element={<RestaurantDetail />} />
           <Route path='/dev/atoms' element={<AtomsPreview />} />
           <Route path='/dev/molecules' element={<MoleculesPreview />} />
