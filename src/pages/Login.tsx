@@ -279,7 +279,7 @@ export default function Login() {
             className='h-screen w-full object-cover rounded-none'
           />
         </div>
-        <div className='flex items-center justify-center p-2xl'>
+        <div className='min-h-screen flex items-center justify-center p-2xl'>
           <Card className='border-none shadow-none'>
             <CardContent className='p-none'>
               <div className='max-w-[360px]'>

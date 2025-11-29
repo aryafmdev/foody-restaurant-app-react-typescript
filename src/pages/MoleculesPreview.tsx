@@ -137,7 +137,7 @@ export default function MoleculesPreview() {
             />
           </div>
           <div className='mt-3xl max-w-[320px]'>
-            <SidebarProfile name='John Doe' />
+            <SidebarProfile name='John Doe' insideDialog={false} />
           </div>
         </CardContent>
       </Card>

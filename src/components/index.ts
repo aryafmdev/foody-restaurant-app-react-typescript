@@ -26,3 +26,4 @@ export { default as StickyCheckoutBar } from './StickyCheckoutBar';
 export { default as MyCheckoutCard } from './MyCheckoutCard';
 export { default as DeliveryAddressCard } from './DeliveryAddressCard';
 export { default as PaymentMethodCard } from './PaymentMethodCard';
+export { default as GiveReviewCard } from './GiveReviewCard';

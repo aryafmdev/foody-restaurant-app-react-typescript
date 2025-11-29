@@ -28,7 +28,7 @@ export default function ReviewCard({
   return (
     <Card
       className={[
-        'rounded-lg shadow-md md:shadow-lg border-none',
+        'rounded-lg border-neutral-200 md:shadow-lg',
         className,
       ]
         .filter(Boolean)

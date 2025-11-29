@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useRestaurantDetailQuery } from '../services/queries/restaurants';
+import { useRestaurantReviewsQuery } from '../services/queries/reviews';
 import {
   useAddToCartMutation,
   useCartQuery,
@@ -31,13 +32,16 @@ export default function RestaurantDetail() {
   const params = useParams();
   const id = Number(params.id);
   const [menuLimit, setMenuLimit] = useState(10);
-  const [reviewLimit, setReviewLimit] = useState(6);
+  const [reviewLimit, setReviewLimit] = useState(10);
   const [menuType, setMenuType] = useState<'all' | 'food' | 'drink'>('all');
   const [imgIndex, setImgIndex] = useState(0);
   const { data, isLoading, isError } = useRestaurantDetailQuery(id, {
     limitMenu: menuLimit,
     limitReview: reviewLimit,
   });
+  const {
+    data: reviewData,
+  } = useRestaurantReviewsQuery(id, { page: 1, limit: reviewLimit });
   const userId = useSelector((s: RootState) => s.auth.userId);
   const addToCart = useAddToCartMutation(userId ?? 'guest');
   const token = useSelector((s: RootState) => s.auth.token);
@@ -95,8 +99,10 @@ export default function RestaurantDetail() {
             (menuType === 'food' ? 'food' : 'drink')
         );
   const canShowMoreMenus = (resto.totalMenus ?? 0) > (resto.menus?.length ?? 0);
-  const canShowMoreReviews =
-    (resto.totalReviews ?? 0) > (resto.reviews?.length ?? 0);
+  const rvList = reviewData?.data?.reviews ?? [];
+  const rvStats = reviewData?.data?.statistics;
+  const rvPag = reviewData?.data?.pagination;
+  const canShowMoreReviews = (rvPag?.total ?? 0) > rvList.length;
   const ratingValue =
     typeof resto.averageRating === 'number' ? resto.averageRating : resto.star;
   const FALLBACK_LAT = -6.175392;
@@ -369,7 +375,7 @@ export default function RestaurantDetail() {
                 className='text-accent-yellow'
               />
               <span className='text-m font-extrabold'>
-                {ratingValue.toFixed(1)} ({resto.totalReviews ?? 0} Ulasan)
+                {ratingValue.toFixed(1)} ({rvStats?.totalReviews ?? 0} Ulasan)
               </span>
             </div>
             <div className='hidden md:flex items-center justify-between'>
@@ -380,13 +386,13 @@ export default function RestaurantDetail() {
                   className='text-accent-yellow'
                 />
                 <span className='text-md'>
-                  {ratingValue.toFixed(1)} ({resto.totalReviews ?? 0} Ulasan)
+                  {ratingValue.toFixed(1)} ({rvStats?.totalReviews ?? 0} Ulasan)
                 </span>
               </div>
             </div>
           </div>
           <div className='mt-xl grid grid-cols-1 md:grid-cols-2 gap-2xl'>
-            {(resto.reviews ?? []).map((rv) => (
+            {rvList.map((rv) => (
               <ReviewCard
                 key={rv.id}
                 name={rv.user?.name ?? 'Anonymous'}
@@ -400,7 +406,7 @@ export default function RestaurantDetail() {
             <div className='mt-2xl flex justify-center'>
               <Button
                 variant='neutral'
-                onClick={() => setReviewLimit(reviewLimit + 6)}
+                onClick={() => setReviewLimit(reviewLimit + 10)}
               >
                 Show More
               </Button>

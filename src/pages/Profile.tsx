@@ -137,6 +137,7 @@ export default function Profile() {
               name={displayName}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}
+              onMyReviews={() => navigate('/my-reviews')}
               onLogout={() => navigate('/login')}
               insideDialog={false}
               className='w-full md:w-[240px]'

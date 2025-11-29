@@ -15,7 +15,10 @@ export function useCreateReviewMutation() {
   });
 }
 
-export function useRestaurantReviewsQuery(restaurantId: number, params?: { page?: number; limit?: number }) {
+export function useRestaurantReviewsQuery(
+  restaurantId: number,
+  params?: { page?: number; limit?: number; rating?: number }
+) {
   return useQuery({
     queryKey: ['reviews', 'restaurant', restaurantId, params ?? {}],
     queryFn: async () => {

@@ -10,6 +10,7 @@ type SidebarProfileProps = {
   onProfile?: () => void;
   onDeliveryAddress?: () => void;
   onMyOrders?: () => void;
+  onMyReviews?: () => void;
   onLogout?: () => void;
   className?: string;
   insideDialog?: boolean;
@@ -20,6 +21,7 @@ export default function SidebarProfile({
   onProfile,
   onDeliveryAddress,
   onMyOrders,
+  onMyReviews,
   onLogout,
   className,
   insideDialog = true,
@@ -104,6 +106,16 @@ export default function SidebarProfile({
             />
             <span className='text-md font-medium text-neutral-900 cursor-pointer'>
               My Orders
+            </span>
+          </button>
+          <button
+            type='button'
+            className='w-full inline-flex items-center gap-md cursor-pointer'
+            onClick={onMyReviews}
+          >
+            <Icon name='carbon:review' size={24} className='text-neutral-900' />
+            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
+              My Reviews
             </span>
           </button>
           <button

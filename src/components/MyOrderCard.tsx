@@ -1,4 +1,5 @@
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
+import { Badge } from '../ui/badge';
 import storeImg from '../assets/images/store.png';
 import itemDefaultImg from '../assets/images/image.png';
 import { Image } from '../ui/image';
@@ -17,6 +18,7 @@ type MyOrderCardProps = {
   items: OrderItem[];
   onGiveReview?: () => void;
   orderId?: string;
+  status?: string;
   className?: string;
 };
 
@@ -25,9 +27,33 @@ export default function MyOrderCard({
   items,
   onGiveReview,
   orderId,
+  status,
   className,
 }: MyOrderCardProps) {
   const total = items.reduce((sum, it) => sum + it.unitPrice * it.quantity, 0);
+  const s = String(status ?? '').toLowerCase();
+  const label = s.replace(/_/g, ' ');
+  type BadgeVariant =
+    | 'default'
+    | 'primary'
+    | 'neutral'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'primary-outline'
+    | 'neutral-outline';
+  const variant: BadgeVariant =
+    s === 'preparing'
+      ? 'warning'
+      : s === 'on_the_way'
+      ? 'primary'
+      : s === 'delivered'
+      ? 'success'
+      : s === 'done'
+      ? 'success'
+      : s === 'cancelled'
+      ? 'error'
+      : 'neutral-outline';
   return (
     <Card
       className={['rounded-lg shadow-md border-none bg-white', className]
@@ -42,9 +68,16 @@ export default function MyOrderCard({
               {storeName}
             </span>
           </div>
-          {orderId ? (
-            <span className='text-sm text-neutral-950'>#{orderId}</span>
-          ) : null}
+          <div className='inline-flex items-center gap-sm'>
+            {status ? (
+              <Badge variant={variant} size='sm'>
+                {label}
+              </Badge>
+            ) : null}
+            {orderId ? (
+              <span className='text-sm text-neutral-950'>{orderId}</span>
+            ) : null}
+          </div>
         </div>
       </CardHeader>
       <CardContent className='p-2xl'>

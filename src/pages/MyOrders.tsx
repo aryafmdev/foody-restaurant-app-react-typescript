@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Container } from '../ui/container';
 import { Card, CardContent } from '../ui/card';
+import { Dialog, DialogContent } from '../ui/dialog';
+import { GiveReviewCard } from '../components';
 import { Skeleton } from '../ui/skeleton';
 import { Alert } from '../ui/alert';
 import SegmentedControl from '../components/SegmentedControl';
@@ -11,6 +13,7 @@ import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
 import { SidebarProfile } from '../components';
 import { useMyOrdersQuery } from '../services/queries/orders';
+import { useCreateReviewMutation } from '../services/queries/reviews';
 import { getOrderHistory } from '../services/queries/orders';
 
 import type {
@@ -44,6 +47,39 @@ export default function MyOrders() {
     [status]
   );
   const { data, isLoading, isError } = useMyOrdersQuery(params);
+  const createReview = useCreateReviewMutation();
+
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewTarget, setReviewTarget] = useState<{
+    transactionId: string;
+    restaurantId: number;
+  } | null>(null);
+  const [rating, setRating] = useState<number>(0);
+  const [comment, setComment] = useState('');
+  const openReview = (transactionId?: string, restaurantId?: number) => {
+    if (!transactionId || restaurantId == null) return;
+    setReviewTarget({ transactionId, restaurantId });
+    setRating(0);
+    setComment('');
+    setReviewOpen(true);
+  };
+  const sendReview = () => {
+    if (!reviewTarget) return;
+    if (rating <= 0) return;
+    createReview.mutate(
+      {
+        transactionId: reviewTarget.transactionId,
+        restaurantId: reviewTarget.restaurantId,
+        star: rating,
+        comment: comment.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setReviewOpen(false);
+        },
+      }
+    );
+  };
 
   type MyOrder = {
     id?: number;
@@ -146,6 +182,10 @@ export default function MyOrders() {
     );
   });
   void filteredOrders;
+  const filteredServerOrdersByStatus =
+    status === 'all'
+      ? filteredServerOrders
+      : filteredServerOrders.filter((o) => String(o?.status ?? '') === status);
   const filteredLocalFallback = localFallbackOrders.filter((o) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
@@ -159,6 +199,10 @@ export default function MyOrders() {
         .includes(q)
     );
   });
+  const filteredLocalFallbackByStatus =
+    status === 'all'
+      ? filteredLocalFallback
+      : filteredLocalFallback.filter((o) => String(o?.status ?? '') === status);
   const tsOf = (o: MyOrder) => {
     const d = Date.parse(String(o?.createdAt ?? ''));
     if (isFinite(d)) return d;
@@ -166,146 +210,114 @@ export default function MyOrders() {
     const num = Number(id.replace(/\D/g, ''));
     return isFinite(num) ? num : 0;
   };
-  const sortedServerOrders = filteredServerOrders
+  const sortedServerOrders = filteredServerOrdersByStatus
     .slice()
     .sort((a, b) => tsOf(b) - tsOf(a));
-  const sortedLocalFallback = filteredLocalFallback
+  const sortedLocalFallback = filteredLocalFallbackByStatus
     .slice()
     .sort((a, b) => tsOf(b) - tsOf(a));
   const showOptimistic =
-    optimisticRestaurants.length > 0 && !isServerConsistent;
+    optimisticRestaurants.length > 0 &&
+    !isServerConsistent &&
+    (status === 'all' || status === 'preparing');
   const hasAnyOrders =
     sortedServerOrders.length > 0 ||
     sortedLocalFallback.length > 0 ||
     showOptimistic;
 
   return (
-    <Container className='py-3xl'>
-      <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
-        <div className='hidden md:block md:w-[240px]'>
-          <SidebarProfile
-            name={profileName || 'User'}
-            onDeliveryAddress={() => navigate('/address')}
-            onMyOrders={() => navigate('/orders')}
-            onLogout={() => navigate('/login')}
-            insideDialog={false}
-            className='w-full md:w-[240px]'
-          />
-        </div>
-
-        <div className='md:col-span-1'>
-          <div className='text-display-md font-extrabold text-neutral-950'>
-            My Orders
-          </div>
-
-          <div className='mt-5xl'>
-            <SearchBar
-              value={search}
-              onChange={setSearch}
-              placeholder='Search'
+    <>
+      <Container className='py-3xl'>
+        <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
+          <div className='hidden md:block md:w-[240px]'>
+            <SidebarProfile
+              name={profileName || 'User'}
+              onDeliveryAddress={() => navigate('/address')}
+              onMyOrders={() => navigate('/orders')}
+              onLogout={() => navigate('/login')}
+              insideDialog={false}
+              className='w-full md:w-[240px]'
             />
           </div>
 
-          <div className='mt-4xl'>
-            <SegmentedControl
-              options={[
-                { label: 'Status', value: 'all' },
-                { label: 'Preparing', value: 'preparing' },
-                { label: 'On The Way', value: 'on_the_way' },
-                { label: 'Delivered', value: 'delivered' },
-                { label: 'Done', value: 'done' },
-                { label: 'Cancelled', value: 'cancelled' },
-              ]}
-              value={status}
-              onChange={(v) => setStatus(v as typeof status)}
-              className='w-full md:w-auto bg-white'
-              scrollable
-            />
-          </div>
+          <div className='md:col-span-1'>
+            <div className='text-display-md font-extrabold text-neutral-950'>
+              My Orders
+            </div>
 
-          {isLoading ? (
-            <div className='mt-2xl space-y-2xl'>
-              {[0, 1].map((i) => (
-                <Card
-                  key={i}
-                  className='rounded-lg shadow-md border-none bg-white'
-                >
-                  <CardContent className='p-2xl space-y-2xl'>
-                    <div className='inline-flex items-center gap-sm'>
-                      <Skeleton className='h-6 w-6 rounded' />
-                      <Skeleton className='h-5 w-32' />
-                    </div>
-                    <div className='flex items-center gap-md'>
-                      <Skeleton className='h-16 w-16 rounded-lg' />
-                      <div className='space-y-xxs'>
-                        <Skeleton className='h-4 w-40' />
-                        <Skeleton className='h-5 w-24' />
+            <div className='mt-5xl'>
+              <SearchBar
+                value={search}
+                onChange={setSearch}
+                placeholder='Search'
+              />
+            </div>
+
+            <div className='mt-4xl'>
+              <SegmentedControl
+                options={[
+                  { label: 'Status', value: 'all' },
+                  { label: 'Preparing', value: 'preparing' },
+                  { label: 'On The Way', value: 'on_the_way' },
+                  { label: 'Delivered', value: 'delivered' },
+                  { label: 'Done', value: 'done' },
+                  { label: 'Cancelled', value: 'cancelled' },
+                ]}
+                value={status}
+                onChange={(v) => setStatus(v as typeof status)}
+                className='w-full md:w-auto bg-white'
+                scrollable
+              />
+            </div>
+
+            {isLoading ? (
+              <div className='mt-2xl space-y-2xl'>
+                {[0, 1].map((i) => (
+                  <Card
+                    key={i}
+                    className='rounded-lg shadow-md border-none bg-white'
+                  >
+                    <CardContent className='p-2xl space-y-2xl'>
+                      <div className='inline-flex items-center gap-sm'>
+                        <Skeleton className='h-6 w-6 rounded' />
+                        <Skeleton className='h-5 w-32' />
                       </div>
-                    </div>
-                    <div className='border-t border-neutral-300' />
-                    <Skeleton className='h-4 w-16' />
-                    <Skeleton className='h-5 w-24' />
-                    <Skeleton className='h-11 w-40 rounded-full' />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : isError ? (
-            <div className='mt-2xl'>
-              <Alert variant='error'>Gagal memuat orders</Alert>
-            </div>
-          ) : !hasAnyOrders ? (
-            <EmptyState
-              title='Belum ada pesanan'
-              description='Mulai pesan dari restoran favorit kamu'
-              actionLabel='Lihat Restoran'
-              onAction={() => navigate('/restaurants')}
-              className='mt-3xl'
-            />
-          ) : (
-            <div className='mt-2xl space-y-2xl'>
-              {showOptimistic && (
-                <div className='space-y-2xl'>
-                  {optimisticRestaurants.map((r, i) => {
-                    const name = r?.restaurant?.name ?? 'Store';
-                    const rid = r?.restaurant?.id;
-                    const items = Array.isArray(r?.items)
-                      ? (r.items as TransactionRestaurantItem[])
-                      : [];
-                    const orderItems = items.map((it) => ({
-                      title: it?.menuName ?? 'Food Name',
-                      unitPrice: it?.price ?? 0,
-                      imageUrl: undefined,
-                      quantity: it?.quantity ?? 0,
-                    }));
-                    return (
-                      <MyOrderCard
-                        key={`optimistic-${String(
-                          tx?.transactionId ?? ''
-                        )}-${i}`}
-                        storeName={name}
-                        items={orderItems}
-                        orderId={tx?.transactionId ?? undefined}
-                        onGiveReview={() =>
-                          navigate(`/restaurant/${String(rid ?? '')}`)
-                        }
-                      />
-                    );
-                  })}
-                </div>
-              )}
-              {sortedLocalFallback.map((o, idx) => {
-                const txId = o?.transactionId ?? `LOCAL-${idx + 1}`;
-                const restaurants = Array.isArray(o?.restaurants)
-                  ? (o.restaurants as unknown as TransactionRestaurant[])
-                  : [];
-                return (
-                  <div key={`local-${txId}`} className='space-y-2xl'>
-                    {restaurants.map((r, i) => {
+                      <div className='flex items-center gap-md'>
+                        <Skeleton className='h-16 w-16 rounded-lg' />
+                        <div className='space-y-xxs'>
+                          <Skeleton className='h-4 w-40' />
+                          <Skeleton className='h-5 w-24' />
+                        </div>
+                      </div>
+                      <div className='border-t border-neutral-300' />
+                      <Skeleton className='h-4 w-16' />
+                      <Skeleton className='h-5 w-24' />
+                      <Skeleton className='h-11 w-40 rounded-full' />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : isError ? (
+              <div className='mt-2xl'>
+                <Alert variant='error'>Gagal memuat orders</Alert>
+              </div>
+            ) : !hasAnyOrders ? (
+              <EmptyState
+                title='Belum ada pesanan'
+                description='Mulai pesan dari restoran favorit kamu'
+                actionLabel='Lihat Restoran'
+                onAction={() => navigate('/restaurants')}
+                className='mt-3xl'
+              />
+            ) : (
+              <div className='mt-2xl space-y-2xl'>
+                {showOptimistic && (
+                  <div className='space-y-2xl'>
+                    {optimisticRestaurants.map((r, i) => {
                       const name = r?.restaurant?.name ?? 'Store';
                       const rid = r?.restaurant?.id;
                       const items = Array.isArray(r?.items)
-                        ? (r.items as unknown as TransactionRestaurantItem[])
+                        ? (r.items as TransactionRestaurantItem[])
                         : [];
                       const orderItems = items.map((it) => ({
                         title: it?.menuName ?? 'Food Name',
@@ -315,58 +327,110 @@ export default function MyOrders() {
                       }));
                       return (
                         <MyOrderCard
-                          key={`local-${txId}-${i}`}
+                          key={`optimistic-${String(
+                            tx?.transactionId ?? ''
+                          )}-${i}`}
                           storeName={name}
                           items={orderItems}
-                          orderId={String(txId)}
+                          orderId={tx?.transactionId ?? undefined}
+                          status={'preparing'}
                           onGiveReview={() =>
-                            navigate(`/restaurant/${String(rid ?? '')}`)
+                            openReview(tx?.transactionId, rid)
                           }
                         />
                       );
                     })}
                   </div>
-                );
-              })}
-              {sortedServerOrders.map((o, idx) => {
-                const txId = o?.transactionId ?? `TRX-${idx + 1}`;
-                const orderDisplayId = o?.id ? String(o.id) : String(txId);
-                const restaurants = Array.isArray(o?.restaurants)
-                  ? (o.restaurants as unknown as TransactionRestaurant[])
-                  : [];
-                return (
-                  <div key={txId} className='space-y-2xl'>
-                    {restaurants.map((r, i) => {
-                      const name = r?.restaurant?.name ?? 'Store';
-                      const rid = r?.restaurant?.id;
-                      const items = Array.isArray(r?.items)
-                        ? (r.items as unknown as TransactionRestaurantItem[])
-                        : [];
-                      const orderItems = items.map((it) => ({
-                        title: it?.menuName ?? 'Food Name',
-                        unitPrice: it?.price ?? 0,
-                        imageUrl: (it as { image?: string })?.image,
-                        quantity: it?.quantity ?? 0,
-                      }));
-                      return (
-                        <MyOrderCard
-                          key={`${txId}-${i}`}
-                          storeName={name}
-                          items={orderItems}
-                          orderId={orderDisplayId}
-                          onGiveReview={() =>
-                            navigate(`/restaurant/${String(rid ?? '')}`)
-                          }
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                )}
+                {sortedLocalFallback.map((o, idx) => {
+                  const txId = o?.transactionId ?? '';
+                  const restaurants = Array.isArray(o?.restaurants)
+                    ? (o.restaurants as unknown as TransactionRestaurant[])
+                    : [];
+                  return (
+                    <div key={`local-${txId || idx}`} className='space-y-2xl'>
+                      {restaurants.map((r, i) => {
+                        const name = r?.restaurant?.name ?? 'Store';
+                        const rid = r?.restaurant?.id;
+                        const items = Array.isArray(r?.items)
+                          ? (r.items as unknown as TransactionRestaurantItem[])
+                          : [];
+                        const orderItems = items.map((it) => ({
+                          title: it?.menuName ?? 'Food Name',
+                          unitPrice: it?.price ?? 0,
+                          imageUrl: undefined,
+                          quantity: it?.quantity ?? 0,
+                        }));
+                        return (
+                          <MyOrderCard
+                            key={`local-${txId}-${i}`}
+                            storeName={name}
+                            items={orderItems}
+                            orderId={o?.transactionId}
+                            status={String(o?.status ?? '')}
+                            onGiveReview={() =>
+                              openReview(o?.transactionId, rid)
+                            }
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+                {sortedServerOrders.map((o, idx) => {
+                  const txId = o?.transactionId ?? '';
+                  const restaurants = Array.isArray(o?.restaurants)
+                    ? (o.restaurants as unknown as TransactionRestaurant[])
+                    : [];
+                  return (
+                    <div key={txId || idx} className='space-y-2xl'>
+                      {restaurants.map((r, i) => {
+                        const name = r?.restaurant?.name ?? 'Store';
+                        const rid = r?.restaurant?.id;
+                        const items = Array.isArray(r?.items)
+                          ? (r.items as unknown as TransactionRestaurantItem[])
+                          : [];
+                        const orderItems = items.map((it) => ({
+                          title: it?.menuName ?? 'Food Name',
+                          unitPrice: it?.price ?? 0,
+                          imageUrl: (it as { image?: string })?.image,
+                          quantity: it?.quantity ?? 0,
+                        }));
+                        return (
+                          <MyOrderCard
+                            key={`${txId}-${i}`}
+                            storeName={name}
+                            items={orderItems}
+                            orderId={o?.transactionId}
+                            status={String(o?.status ?? '')}
+                            onGiveReview={() =>
+                              openReview(o?.transactionId, rid)
+                            }
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+
+      <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
+        <DialogContent className='rounded-2xl p-xl w-[92%] max-w-[400px] mx-auto'>
+          <GiveReviewCard
+            rating={rating}
+            onRatingChange={setRating}
+            comment={comment}
+            onCommentChange={(v) => setComment(v)}
+            onSubmit={sendReview}
+            pending={createReview.isPending}
+            disabled={rating <= 0 || !reviewTarget}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -186,43 +186,47 @@ export default function Navbar({
         )}
       </Container>
 
-      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent side='right' offsetTop={isMobile ? 0 : navHeight}>
-          <SidebarProfile
-            name={displayName}
-            onProfile={() => {
-              setProfileOpen(false);
-              navigate('/profile');
-            }}
-            onDeliveryAddress={() => {
-              setProfileOpen(false);
-              navigate('/address');
-            }}
-            onMyOrders={() => {
-              setProfileOpen(false);
-              navigate('/orders');
-            }}
-            onLogout={() => {
-              setProfileOpen(false);
-              try {
-                sessionStorage.removeItem('auth');
-              } catch {
-                void 0;
-              }
-              try {
-                localStorage.removeItem('auth');
-              } catch {
-                void 0;
-              }
-              dispatch(setToken(null));
-              dispatch(setUserId(null));
-              dispatch(clearCart());
-              qc.clear();
-              navigate('/login');
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+          <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+            <DialogContent side='right' offsetTop={isMobile ? 0 : navHeight}>
+              <SidebarProfile
+                name={displayName}
+                onProfile={() => {
+                  setProfileOpen(false);
+                  navigate('/profile');
+                }}
+                onDeliveryAddress={() => {
+                  setProfileOpen(false);
+                  navigate('/address');
+                }}
+                onMyOrders={() => {
+                  setProfileOpen(false);
+                  navigate('/orders');
+                }}
+                onMyReviews={() => {
+                  setProfileOpen(false);
+                  navigate('/my-reviews');
+                }}
+                onLogout={() => {
+                  setProfileOpen(false);
+                  try {
+                    sessionStorage.removeItem('auth');
+                  } catch {
+                    void 0;
+                  }
+                  try {
+                    localStorage.removeItem('auth');
+                  } catch {
+                    void 0;
+                  }
+                  dispatch(setToken(null));
+                  dispatch(setUserId(null));
+                  dispatch(clearCart());
+                  qc.clear();
+                  navigate('/login');
+                }}
+              />
+            </DialogContent>
+          </Dialog>
     </nav>
   );
 }
