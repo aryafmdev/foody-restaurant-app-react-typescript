@@ -108,7 +108,11 @@ export default function Home() {
               image={catNearby}
               onClick={() => navigate('/restaurants?distance=nearby')}
             />
-            <CategoryCard label='Discount' image={catDiscount} />
+            <CategoryCard
+              label='Discount'
+              image={catDiscount}
+              onClick={() => navigate('/restaurants?priceMax=50000')}
+            />
             <CategoryCard
               label='Best Seller'
               image={catBestSeller}

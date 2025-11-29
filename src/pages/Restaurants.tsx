@@ -23,7 +23,9 @@ export default function Restaurants() {
   const initialDistance = (() => {
     const d = sp.get('distance');
     const allowed = ['nearby', '1km', '3km', '5km'];
-    return allowed.includes(String(d)) ? (d as RestaurantFilters['distance']) : undefined;
+    return allowed.includes(String(d))
+      ? (d as RestaurantFilters['distance'])
+      : undefined;
   })();
   const initialRatings = (() => {
     const r = sp.get('ratings');
@@ -34,7 +36,22 @@ export default function Restaurants() {
       .filter((n) => Number.isFinite(n) && n >= 1 && n <= 5);
     return arr;
   })();
-  const [filters, setFilters] = useState<RestaurantFilters>({ ratings: initialRatings, distance: initialDistance });
+  const initialPriceMin = (() => {
+    const v = sp.get('priceMin');
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : undefined;
+  })();
+  const initialPriceMax = (() => {
+    const v = sp.get('priceMax');
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : undefined;
+  })();
+  const [filters, setFilters] = useState<RestaurantFilters>({
+    ratings: initialRatings,
+    distance: initialDistance,
+    priceMin: initialPriceMin,
+    priceMax: initialPriceMax,
+  });
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??
