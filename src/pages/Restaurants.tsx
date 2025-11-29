@@ -17,9 +17,13 @@ import type {
 } from '../types/schemas';
 
 export default function Restaurants() {
-  const { data, isLoading, isError } = useAllRestaurantsQuery();
   const [open, setOpen] = useState(false);
   const [sp] = useSearchParams();
+  const initialQ = (() => {
+    const q = sp.get('q');
+    const s = String(q ?? '').trim();
+    return s ? s : undefined;
+  })();
   const initialDistance = (() => {
     const d = sp.get('distance');
     const allowed = ['nearby', '1km', '3km', '5km'];
@@ -52,6 +56,7 @@ export default function Restaurants() {
     priceMin: initialPriceMin,
     priceMax: initialPriceMax,
   });
+  const { data, isLoading, isError } = useAllRestaurantsQuery({ q: initialQ });
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??

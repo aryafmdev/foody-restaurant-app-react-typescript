@@ -123,7 +123,16 @@ export default function Home() {
               image={catDelivery}
               onClick={() => navigate('/restaurants?distance=1km')}
             />
-            <CategoryCard label='Lunch' image={catLunch} />
+            <CategoryCard
+              label='Lunch'
+              image={catLunch}
+              onClick={() => {
+                const q = search.trim();
+                navigate(
+                  q ? `/restaurants?q=${encodeURIComponent(q)}` : '/restaurants'
+                );
+              }}
+            />
           </div>
 
           <div className='mt-3xl flex items-center justify-between'>
