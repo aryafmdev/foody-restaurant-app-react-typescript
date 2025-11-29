@@ -110,14 +110,16 @@ export default function MyOrderCard({
               {formatCurrency(total, 'IDR')}
             </div>
           </div>
-          <Button
-            variant='primary'
-            size='md'
-            className='mt-lg md:mt-0 w-full md:w-auto rounded-full h-12'
-            onClick={onGiveReview}
-          >
-            Give Review
-          </Button>
+          {onGiveReview ? (
+            <Button
+              variant='primary'
+              size='md'
+              className='mt-lg md:mt-0 w-full md:w-auto rounded-full h-12'
+              onClick={onGiveReview}
+            >
+              Give Review
+            </Button>
+          ) : null}
         </div>
       </CardFooter>
     </Card>

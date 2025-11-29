@@ -12,6 +12,8 @@ import SegmentedControl from '../components/SegmentedControl';
 import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
 import { SidebarProfile } from '../components';
+import { Icon } from '../ui/icon';
+import { IconButton } from '../ui/icon-button';
 import { useMyOrdersQuery } from '../services/queries/orders';
 import { useCreateReviewMutation } from '../services/queries/reviews';
 import { getOrderHistory } from '../services/queries/orders';
@@ -227,7 +229,7 @@ export default function MyOrders() {
 
   return (
     <>
-      <Container className='py-3xl'>
+      <Container className='py-3xl relative'>
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
@@ -416,8 +418,17 @@ export default function MyOrders() {
             )}
           </div>
         </div>
+        <div className='h-16 md:h-20' />
+        <IconButton
+          aria-label='Update Order Status'
+          variant='ghost'
+          size='none'
+          className='absolute bottom-4 right-4 md:bottom-6 md:right-6 size-10 rounded-full shadow-lg z-10 hover:bg-primary-100'
+          onClick={() => navigate('/orders/update-status')}
+        >
+          <Icon name='ix:app-update' size={24} className='text-white' />
+        </IconButton>
       </Container>
-
       <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
         <DialogContent className='rounded-2xl p-xl w-[92%] max-w-[400px] mx-auto'>
           <GiveReviewCard
