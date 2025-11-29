@@ -11,6 +11,7 @@ import MoleculesPreview from '../pages/MoleculesPreview';
 import HeaderPreview from '../pages/HeaderPreview';
 import MyOrders from '../pages/MyOrders';
 import Checkout from '../pages/Checkout';
+import Success from '../pages/Success';
 import { Navbar, Footer } from '../components';
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
           <Route path='/profile' element={<Profile />} />
           <Route path='/cart' element={<Cart />} />
           <Route path='/checkout' element={<Checkout />} />
+          <Route path='/success' element={<Success />} />
           <Route path='/orders' element={<MyOrders />} />
           <Route path='/restaurant/:id' element={<RestaurantDetail />} />
           <Route path='/dev/atoms' element={<AtomsPreview />} />

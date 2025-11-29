@@ -146,7 +146,22 @@ export default function Checkout() {
           onBuy={() =>
             checkout.mutate(
               { paymentMethod: payment },
-              { onSuccess: () => navigate('/orders') }
+              {
+                onSuccess: (res) => {
+                  const tx = res?.data?.transaction;
+                  navigate('/success', {
+                    state: {
+                      paymentMethod: tx?.paymentMethod ?? payment,
+                      createdAt: tx?.createdAt ?? new Date().toISOString(),
+                      itemsCount: summary?.totalItems ?? 0,
+                      subtotal,
+                      deliveryFee,
+                      serviceFee,
+                      total: grandTotal,
+                    },
+                  });
+                },
+              }
             )
           }
         />
