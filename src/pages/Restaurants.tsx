@@ -25,7 +25,16 @@ export default function Restaurants() {
     const allowed = ['nearby', '1km', '3km', '5km'];
     return allowed.includes(String(d)) ? (d as RestaurantFilters['distance']) : undefined;
   })();
-  const [filters, setFilters] = useState<RestaurantFilters>({ ratings: [], distance: initialDistance });
+  const initialRatings = (() => {
+    const r = sp.get('ratings');
+    if (!r) return [] as number[];
+    const arr = String(r)
+      .split(',')
+      .map((x) => Number(x))
+      .filter((n) => Number.isFinite(n) && n >= 1 && n <= 5);
+    return arr;
+  })();
+  const [filters, setFilters] = useState<RestaurantFilters>({ ratings: initialRatings, distance: initialDistance });
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??
