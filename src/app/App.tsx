@@ -14,6 +14,7 @@ import MyReviews from '../pages/MyReviews';
 import UpdateOrderStatus from '../pages/UpdateOrderStatus';
 import Checkout from '../pages/Checkout';
 import Success from '../pages/Success';
+import DeliveryAddress from '../pages/DeliveryAddress';
 import { Navbar, Footer } from '../components';
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
           <Route path='/cart' element={<Cart />} />
           <Route path='/checkout' element={<Checkout />} />
           <Route path='/success' element={<Success />} />
+          <Route path='/address' element={<DeliveryAddress />} />
           <Route path='/orders' element={<MyOrders />} />
           <Route path='/orders/update-status' element={<UpdateOrderStatus />} />
           <Route path='/my-reviews' element={<MyReviews />} />

@@ -88,9 +88,9 @@ export default function SidebarProfile({
             <Icon
               name='mdi:map-marker-outline'
               size={24}
-              className='text-neutral-900'
+              className='text-neutral-900 cursor-pointer'
             />
-            <span className='text-md font-medium text-neutral-900'>
+            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
               Delivery Address
             </span>
           </button>
