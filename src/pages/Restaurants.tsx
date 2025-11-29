@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 
 import { Container } from '../ui/container';
@@ -19,7 +19,13 @@ import type {
 export default function Restaurants() {
   const { data, isLoading, isError } = useAllRestaurantsQuery();
   const [open, setOpen] = useState(false);
-  const [filters, setFilters] = useState<RestaurantFilters>({ ratings: [] });
+  const [sp] = useSearchParams();
+  const initialDistance = (() => {
+    const d = sp.get('distance');
+    const allowed = ['nearby', '1km', '3km', '5km'];
+    return allowed.includes(String(d)) ? (d as RestaurantFilters['distance']) : undefined;
+  })();
+  const [filters, setFilters] = useState<RestaurantFilters>({ ratings: [], distance: initialDistance });
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??
