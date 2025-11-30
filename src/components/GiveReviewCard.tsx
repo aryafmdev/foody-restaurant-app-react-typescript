@@ -27,7 +27,7 @@ export default function GiveReviewCard({
   className,
 }: GiveReviewCardProps) {
   return (
-    <div className={['rounded-2xl', className].filter(Boolean).join(' ')}>
+    <div className={['rounded-lg', className].filter(Boolean).join(' ')}>
       <div className='flex items-center justify-between'>
         <DialogTitle className='text-lg font-extrabold text-neutral-950'>{title}</DialogTitle>
         <DialogClose asChild>
@@ -37,7 +37,7 @@ export default function GiveReviewCard({
         </DialogClose>
       </div>
 
-      <div className='mt-md text-sm font-bold text-neutral-900 text-center'>Give Rating</div>
+      <div className='mt-md text-sm font-bold text-neutral-950 text-center'>Give Rating</div>
       <div className='mt-sm flex items-center justify-center gap-xs'>
         {Array.from({ length: 5 }).map((_, i) => (
           <button

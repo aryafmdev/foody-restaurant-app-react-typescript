@@ -39,9 +39,10 @@ export default function RestaurantDetail() {
     limitMenu: menuLimit,
     limitReview: reviewLimit,
   });
-  const {
-    data: reviewData,
-  } = useRestaurantReviewsQuery(id, { page: 1, limit: reviewLimit });
+  const { data: reviewData } = useRestaurantReviewsQuery(id, {
+    page: 1,
+    limit: reviewLimit,
+  });
   const userId = useSelector((s: RootState) => s.auth.userId);
   const addToCart = useAddToCartMutation(userId ?? 'guest');
   const token = useSelector((s: RootState) => s.auth.token);
@@ -126,7 +127,7 @@ export default function RestaurantDetail() {
   return (
     <div className='bg-white'>
       <Container className='py-2xl'>
-        <div className='grid grid-cols-1 md:grid-cols-9 gap-lg'>
+        <div className='grid grid-cols-1 md:grid-cols-9 gap-md'>
           <div className='block md:hidden'>
             <div className='w-full'>
               <Image
@@ -150,7 +151,7 @@ export default function RestaurantDetail() {
               ))}
             </div>
           </div>
-          <div className='hidden md:block md:col-span-5 md:h-[400px]'>
+          <div className='hidden md:block md:col-span-5 md:max-h-170'>
             <Image
               src={gallery[0]}
               fallbackSrc={fallbackImg}
@@ -158,7 +159,7 @@ export default function RestaurantDetail() {
               className='h-full w-full rounded-lg object-cover'
             />
           </div>
-          <div className='hidden md:grid md:h-[400px] md:grid-rows-3 gap-md md:col-span-4'>
+          <div className='hidden md:grid md:max-h-170 md:grid-rows-3 gap-md md:col-span-4'>
             <div className='overflow-hidden rounded-lg md:row-span-2'>
               <Image
                 src={gallery[1]}
@@ -262,7 +263,7 @@ export default function RestaurantDetail() {
             inactiveSize='lg'
             onToggle={(id) => setMenuType(id as 'all' | 'food' | 'drink')}
           />
-          <div className='mt-xl grid grid-cols-2 md:grid-cols-4 gap-2xl'>
+          <div className='mt-xl grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2xl'>
             {filteredMenus.map((m) => (
               <ProductCard
                 key={m.id}

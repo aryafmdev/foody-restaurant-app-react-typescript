@@ -6,6 +6,7 @@ import {
   DialogClose,
   DialogPortal,
 } from '../ui/dialog';
+import { Card, CardContent, CardHeader } from '../ui/card';
 import { Icon } from '../ui/icon';
 import { IconButton } from '../ui/icon-button';
 import { Divider } from '../ui/divider';
@@ -61,97 +62,15 @@ export default function RestaurantFilterDialog({
           <div className='text-lg font-extrabold text-neutral-950'>FILTER</div>
         </div>
 
-        <div className='mt-2xl'>
-          <div className='text-md font-extrabold text-neutral-950'>
-            Distance
-          </div>
-          <div className='mt-md space-y-2xl'>
-            <label className='flex items-center'>
-              <Checkbox
-                checked={d === 'nearby'}
-                onChange={() => toggleDistance('nearby')}
-              />
-              <CheckboxLabel>Nearby</CheckboxLabel>
-            </label>
-            <label className='flex items-center'>
-              <Checkbox
-                checked={d === '1km'}
-                onChange={() => toggleDistance('1km')}
-              />
-              <CheckboxLabel>Within 1 km</CheckboxLabel>
-            </label>
-            <label className='flex items-center'>
-              <Checkbox
-                checked={d === '3km'}
-                onChange={() => toggleDistance('3km')}
-              />
-              <CheckboxLabel>Within 3 km</CheckboxLabel>
-            </label>
-            <label className='flex items-center'>
-              <Checkbox
-                checked={d === '5km'}
-                onChange={() => toggleDistance('5km')}
-              />
-              <CheckboxLabel>Within 5 km</CheckboxLabel>
-            </label>
-          </div>
-          <Divider className='mt-xl' />
-
-          <div className='mt-xl'>
-            <div className='text-md font-extrabold text-neutral-950'>Price</div>
-            <div className='mt-md space-y-md'>
-              <div className='relative w-full'>
-                <span className='absolute left-2xl top-1/2 -translate-y-1/2 text-neutral-700'>
-                  Rp
-                </span>
-                <Input
-                  placeholder='Minimum Price'
-                  uiSize='md'
-                  className='pl-10'
-                  value={filters.priceMin ?? ''}
-                  onChange={(e) => onMinChange(e.target.value)}
-                />
-              </div>
-              <div className='relative w-full'>
-                <span className='absolute left-2xl top-1/2 -translate-y-1/2 text-neutral-700'>
-                  Rp
-                </span>
-                <Input
-                  placeholder='Maximum Price'
-                  uiSize='md'
-                  className='pl-10'
-                  value={filters.priceMax ?? ''}
-                  onChange={(e) => onMaxChange(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-          <Divider className='mt-xl' />
-
-          <div className='mt-xl'>
-            <div className='text-md font-extrabold text-neutral-950'>
-              Rating
-            </div>
-            <div className='mt-md space-y-2xl'>
-              {[5, 4, 3, 2, 1].map((r) => (
-                <label key={r} className='flex items-center'>
-                  <Checkbox
-                    checked={ratings.includes(r)}
-                    onChange={() => toggleRating(r)}
-                  />
-                  <CheckboxLabel className='inline-flex items-center gap-xxs'>
-                    <Icon
-                      name='material-symbols:star-rounded'
-                      size={18}
-                      className='text-yellow-500'
-                    />
-                    {r}
-                  </CheckboxLabel>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
+        <FilterContent
+          filters={filters}
+          d={d}
+          ratings={ratings}
+          toggleDistance={toggleDistance}
+          toggleRating={toggleRating}
+          onMinChange={onMinChange}
+          onMaxChange={onMaxChange}
+        />
       </DialogContent>
       <DialogPortal>
         <DialogClose asChild>
@@ -164,11 +83,167 @@ export default function RestaurantFilterDialog({
             <Icon
               name='iconamoon:close'
               size={20}
-              className='text-neutral-900 cursor-pointer'
+              className='text-neutral-950 cursor-pointer'
             />
           </IconButton>
         </DialogClose>
       </DialogPortal>
     </Dialog>
+  );
+}
+
+type FilterContentPropsInternal = {
+  filters: RestaurantFilters;
+  d: RestaurantFilters['distance'];
+  ratings: number[];
+  toggleDistance: (val: 'nearby' | '1km' | '3km' | '5km') => void;
+  toggleRating: (val: number) => void;
+  onMinChange: (v: string) => void;
+  onMaxChange: (v: string) => void;
+};
+
+function FilterContent({
+  filters,
+  d,
+  ratings,
+  toggleDistance,
+  toggleRating,
+  onMinChange,
+  onMaxChange,
+}: FilterContentPropsInternal) {
+  return (
+    <div className='mt-2xl'>
+      <div className='text-md font-extrabold text-neutral-950'>Distance</div>
+      <div className='mt-md space-y-2xl'>
+        <label className='flex items-center'>
+          <Checkbox
+            checked={d === 'nearby'}
+            onChange={() => toggleDistance('nearby')}
+          />
+          <CheckboxLabel>Nearby</CheckboxLabel>
+        </label>
+        <label className='flex items-center'>
+          <Checkbox
+            checked={d === '1km'}
+            onChange={() => toggleDistance('1km')}
+          />
+          <CheckboxLabel>Within 1 km</CheckboxLabel>
+        </label>
+        <label className='flex items-center'>
+          <Checkbox
+            checked={d === '3km'}
+            onChange={() => toggleDistance('3km')}
+          />
+          <CheckboxLabel>Within 3 km</CheckboxLabel>
+        </label>
+        <label className='flex items-center'>
+          <Checkbox
+            checked={d === '5km'}
+            onChange={() => toggleDistance('5km')}
+          />
+          <CheckboxLabel>Within 5 km</CheckboxLabel>
+        </label>
+      </div>
+      <Divider className='mt-xl' />
+
+      <div className='mt-xl'>
+        <div className='text-md font-extrabold text-neutral-950'>Price</div>
+        <div className='mt-md space-y-md'>
+          <div className='relative w-full'>
+            <span className='absolute bg-neutral-200 p-sm rounded-sm left-xl top-1/2 -translate-y-1/2 text-neutral-700'>
+              Rp
+            </span>
+            <Input
+              placeholder='Minimum Price'
+              uiSize='md'
+              className='pl-12'
+              value={filters.priceMin ?? ''}
+              onChange={(e) => onMinChange(e.target.value)}
+            />
+          </div>
+          <div className='relative w-full'>
+            <span className='absolute bg-neutral-200 p-sm rounded-sm left-xl top-1/2 -translate-y-1/2 text-neutral-700'>
+              Rp
+            </span>
+            <Input
+              placeholder='Maximum Price'
+              uiSize='md'
+              className='pl-12'
+              value={filters.priceMax ?? ''}
+              onChange={(e) => onMaxChange(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+      <Divider className='mt-xl' />
+
+      <div className='mt-xl'>
+        <div className='text-md font-extrabold text-neutral-950'>Rating</div>
+        <div className='mt-md space-y-2xl'>
+          {[5, 4, 3, 2, 1].map((r) => (
+            <label key={r} className='flex items-center'>
+              <Checkbox
+                checked={ratings.includes(r)}
+                onChange={() => toggleRating(r)}
+              />
+              <CheckboxLabel className='inline-flex items-center gap-xxs'>
+                <Icon
+                  name='material-symbols:star-rounded'
+                  size={18}
+                  className='text-yellow-500'
+                />
+                {r}
+              </CheckboxLabel>
+            </label>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function RestaurantFilterPanel({
+  filters,
+  onFiltersChange,
+}: {
+  filters: RestaurantFilters;
+  onFiltersChange: (next: RestaurantFilters) => void;
+}) {
+  const d = filters.distance;
+  const ratings = filters.ratings ?? [];
+  const toggleDistance = (val: 'nearby' | '1km' | '3km' | '5km') => {
+    const next = d === val ? undefined : val;
+    onFiltersChange({ ...filters, distance: next });
+  };
+  const toggleRating = (val: number) => {
+    const exists = ratings.includes(val);
+    const next = exists ? ratings.filter((x) => x !== val) : [...ratings, val];
+    onFiltersChange({ ...filters, ratings: next });
+  };
+  const onMinChange = (v: string) => {
+    const num = v.trim() ? Number(v) : undefined;
+    onFiltersChange({ ...filters, priceMin: num });
+  };
+  const onMaxChange = (v: string) => {
+    const num = v.trim() ? Number(v) : undefined;
+    onFiltersChange({ ...filters, priceMax: num });
+  };
+  return (
+    <Card>
+      <CardHeader className='p-xl border-b border-neutral-200'>
+        <div className='text-lg font-extrabold text-neutral-950'>FILTER</div>
+      </CardHeader>
+      <CardContent className='p-xl'>
+        <FilterContent
+          filters={filters}
+          d={d}
+          ratings={ratings}
+          toggleDistance={toggleDistance}
+          toggleRating={toggleRating}
+          onMinChange={onMinChange}
+          onMaxChange={onMaxChange}
+        />
+      </CardContent>
+    </Card>
   );
 }

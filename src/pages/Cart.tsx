@@ -26,14 +26,14 @@ export default function Cart() {
 
   if (!isLoggedIn) {
     return (
-      <Container className='py-2xl'>
+      <Container className='py-6xl max-w-[800px]'>
         <Alert variant='warning'>Please sign in to view your cart</Alert>
       </Container>
     );
   }
   if (isLoading)
     return (
-      <Container className='py-2xl'>
+      <Container className='py-6xl max-w-[800px]'>
         <Skeleton className='h-6 w-40' />
         <Skeleton className='mt-xs h-4 w-56' />
         <div className='mt-2xl space-y-2xl'>
@@ -88,10 +88,10 @@ export default function Cart() {
   const summary = data?.data?.summary;
 
   return (
-    <Container className='py-2xl'>
+    <Container className='py-2xl mb-6xl max-w-[800px]'>
       <div className='flex items-start justify-between'>
         <div>
-          <div className='text-display-xs font-extrabold text-neutral-950'>
+          <div className='text-display-xs md:text-display-md font-extrabold text-neutral-950'>
             My Cart
           </div>
           <div className='mt-xs text-sm text-neutral-700'>

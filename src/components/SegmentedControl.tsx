@@ -20,8 +20,9 @@ export default function SegmentedControl({
     <div
       className={cn(
         'inline-flex items-center gap-md',
-        scrollable &&
-          'w-full overflow-x-auto whitespace-nowrap md:overflow-visible',
+        scrollable
+          ? 'w-full overflow-x-auto whitespace-nowrap md:overflow-visible md:flex-wrap md:whitespace-normal'
+          : 'w-full flex-wrap',
         className
       )}
     >
@@ -33,7 +34,7 @@ export default function SegmentedControl({
             size='sm'
             variant='ghost'
             className={cn(
-              'rounded-full bg-white text-neutral-950 border border-neutral-300',
+              'rounded-full bg-white text-neutral-950 border border-neutral-300 whitespace-nowrap shrink-0 md:px-md md:h-8 md:text-sm',
               active ? 'border-none font-extrabold' : 'font-medium'
             )}
             onClick={() => onChange(opt.value)}

@@ -100,109 +100,116 @@ export default function Checkout() {
   const grandTotal = subtotal + deliveryFee + serviceFee;
 
   return (
-    <Container className='mb-6xl'>
+    <Container className='mb-6xl max-w-[1000px]'>
       <div className='text-display-sm font-extrabold text-neutral-950'>
         Checkout
       </div>
 
-      <div className='mt-2xl space-y-xl'>
-        <DeliveryAddressCard
-          className='mt-xs'
-          address={'Jl. Sudirman No. 10, Jakarta'}
-          phone={profile?.data?.phone ?? '08xx-xxxx-xxxx'}
-          changeLabel='Change'
-          onChange={() => navigate('/profile')}
-        />
+      <div className='mt-2xl'>
+        <div className='grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_clamp(280px,28vw,360px)] gap-2xl items-start'>
+          <div className='space-y-xl'>
+            <DeliveryAddressCard
+              className='mt-xs'
+              address={'Jl. Sudirman No. 10, Jakarta'}
+              phone={profile?.data?.phone ?? '08xx-xxxx-xxxx'}
+              changeLabel='Change'
+              onChange={() => navigate('/profile')}
+            />
 
-        <div>
-          {groups.map((g) => {
-            const byIndexId = g.items.map((it) => it.id);
-            return (
-              <MyCheckoutCard
-                storeName={g.restaurant.name}
-                onClickStore={() => navigate(`/restaurant/${g.restaurant.id}`)}
-                onAddItem={() => navigate(`/restaurant/${g.restaurant.id}`)}
-                items={g.items.map((it) => ({
-                  title: it.menu.foodName,
-                  price: it.menu.price,
-                  imageUrl: it.menu.image,
-                  quantity: it.quantity,
-                }))}
-                onChangeItemQty={(index, q) => {
-                  const id = byIndexId[index];
-                  if (q <= 0) removeItem.mutate({ id });
-                  else updateQty.mutate({ id, quantity: q });
-                }}
-                className='mb-2xl'
-              />
-            );
-          })}
-        </div>
-
-        <PaymentMethodCard
-          selected={payment}
-          onChange={setPayment}
-          itemsCount={summary?.totalItems ?? 0}
-          subtotal={subtotal}
-          deliveryFee={deliveryFee}
-          serviceFee={serviceFee}
-          total={grandTotal}
-          buying={checkout.isPending}
-          buyingLabel='Buying...'
-          onBuy={() =>
-            checkout.mutate(
-              { paymentMethod: payment },
-              {
-                onSuccess: (res) => {
-                  const tx = res?.data?.transaction;
-                  const restaurantsOptimistic = groups.map((g) => ({
-                    restaurant: {
-                      id: g.restaurant.id,
-                      name: g.restaurant.name,
-                      logo: g.restaurant.logo,
-                    },
-                    items: g.items.map((it) => ({
-                      menuId: it.menu.id,
-                      menuName: it.menu.foodName,
+            <div>
+              {groups.map((g) => {
+                const byIndexId = g.items.map((it) => it.id);
+                return (
+                  <MyCheckoutCard
+                    storeName={g.restaurant.name}
+                    onClickStore={() =>
+                      navigate(`/restaurant/${g.restaurant.id}`)
+                    }
+                    onAddItem={() => navigate(`/restaurant/${g.restaurant.id}`)}
+                    items={g.items.map((it) => ({
+                      title: it.menu.foodName,
                       price: it.menu.price,
+                      imageUrl: it.menu.image,
                       quantity: it.quantity,
-                      itemTotal: it.itemTotal,
-                    })),
-                    subtotal: g.subtotal,
-                  }));
-                  const optimisticTx: Transaction = {
-                    id: tx?.id,
-                    transactionId: tx?.transactionId ?? `TRX-${Date.now()}`,
-                    paymentMethod: tx?.paymentMethod ?? payment,
-                    status: tx?.status ?? 'preparing',
-                    restaurants: restaurantsOptimistic,
-                    pricing: {
-                      subtotal,
-                      serviceFee,
-                      deliveryFee,
-                      totalPrice: grandTotal,
+                    }))}
+                    onChangeItemQty={(index, q) => {
+                      const id = byIndexId[index];
+                      if (q <= 0) removeItem.mutate({ id });
+                      else updateQty.mutate({ id, quantity: q });
+                    }}
+                    className='mb-2xl'
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <PaymentMethodCard
+              selected={payment}
+              onChange={setPayment}
+              itemsCount={summary?.totalItems ?? 0}
+              subtotal={subtotal}
+              deliveryFee={deliveryFee}
+              serviceFee={serviceFee}
+              total={grandTotal}
+              buying={checkout.isPending}
+              buyingLabel='Buying...'
+              onBuy={() =>
+                checkout.mutate(
+                  { paymentMethod: payment },
+                  {
+                    onSuccess: (res) => {
+                      const tx = res?.data?.transaction;
+                      const restaurantsOptimistic = groups.map((g) => ({
+                        restaurant: {
+                          id: g.restaurant.id,
+                          name: g.restaurant.name,
+                          logo: g.restaurant.logo,
+                        },
+                        items: g.items.map((it) => ({
+                          menuId: it.menu.id,
+                          menuName: it.menu.foodName,
+                          price: it.menu.price,
+                          quantity: it.quantity,
+                          itemTotal: it.itemTotal,
+                        })),
+                        subtotal: g.subtotal,
+                      }));
+                      const optimisticTx: Transaction = {
+                        id: tx?.id,
+                        transactionId: tx?.transactionId ?? `TRX-${Date.now()}`,
+                        paymentMethod: tx?.paymentMethod ?? payment,
+                        status: tx?.status ?? 'preparing',
+                        restaurants: restaurantsOptimistic,
+                        pricing: {
+                          subtotal,
+                          serviceFee,
+                          deliveryFee,
+                          totalPrice: grandTotal,
+                        },
+                        createdAt: tx?.createdAt ?? new Date().toISOString(),
+                      };
+                      putOrderHistory(userId ?? 'guest', optimisticTx);
+                      clearCart.mutate();
+                      navigate('/success', {
+                        state: {
+                          transaction: optimisticTx,
+                          paymentMethod: tx?.paymentMethod ?? payment,
+                          createdAt: tx?.createdAt ?? new Date().toISOString(),
+                          itemsCount: summary?.totalItems ?? 0,
+                          subtotal,
+                          deliveryFee,
+                          serviceFee,
+                          total: grandTotal,
+                        },
+                      });
                     },
-                    createdAt: tx?.createdAt ?? new Date().toISOString(),
-                  };
-                  putOrderHistory(userId ?? 'guest', optimisticTx);
-                  clearCart.mutate();
-                  navigate('/success', {
-                    state: {
-                      transaction: optimisticTx,
-                      paymentMethod: tx?.paymentMethod ?? payment,
-                      createdAt: tx?.createdAt ?? new Date().toISOString(),
-                      itemsCount: summary?.totalItems ?? 0,
-                      subtotal,
-                      deliveryFee,
-                      serviceFee,
-                      total: grandTotal,
-                    },
-                  });
-                },
+                  }
+                )
               }
-            )
-          }
-        />
+            />
+          </div>
+        </div>
       </div>
     </Container>
   );

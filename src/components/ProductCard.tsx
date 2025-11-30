@@ -42,7 +42,7 @@ export default function ProductCard({
     onQuantityChange?.(next);
   };
   return (
-    <Card className='overflow-hidden rounded-lg shadow-md md:shadow-lg border-none h-[306px] md:w-auto md:h-[379px] grid grid-rows-2 md:grid-rows-[3fr_1fr]'>
+    <Card className='overflow-hidden rounded-lg shadow-md md:shadow-lg border-none h-auto w-auto flex flex-col'>
       <CardHeader className='p-none h-full'>
         <Image
           src={img}
@@ -54,10 +54,10 @@ export default function ProductCard({
       <CardContent className='p-lg md:p-2xl h-full flex flex-col md:flex-row md:items-center md:justify-between'>
         <div className='flex flex-col gap-md'>
           <div>
-            <div className='mt-xl text-sm font-medium md:text-md text-neutral-950 line-clamp-1'>
+            <div className='mt-lg text-sm font-medium md:text-md text-neutral-950 line-clamp-1'>
               {title}
             </div>
-            <div className='mt-xl text-md md:text-lg font-extrabold text-neutral-900'>
+            <div className='mt-lg text-md md:text-lg font-extrabold text-neutral-900'>
               {formatCurrency(price, 'IDR')}
             </div>
           </div>
@@ -66,17 +66,17 @@ export default function ProductCard({
           <Button
             variant='primary'
             size='sm'
-            className='w-full md:w-[79px] md:h-[40px] md:text-md md:mt-0 mt-auto'
+            className='w-full mt-xl md:w-[79px] md:h-[40px] md:text-md md:mt-0 mt-auto'
             onClick={add}
           >
             Add
           </Button>
         ) : (
-          <div className='mt-auto md:mt-0 inline-flex items-center gap-md w-full md:w-auto md:ml-auto'>
+          <div className='mt-auto md:mt-0 inline-flex items-center w-full md:w-auto md:ml-auto'>
             <Button
               variant='outline'
               size='sm'
-              className='!w-10 !h-10 !rounded-full !px-0 !py-0 leading-none shrink-0'
+              className='!size-8 xl:!size-10 !rounded-full !px-0 !py-0 leading-none shrink-0'
               onClick={dec}
             >
               <Icon
@@ -85,13 +85,13 @@ export default function ProductCard({
                 className='text-neutral-900'
               />
             </Button>
-            <span className='min-w-6 text-center text-md md:text-lg text-neutral-900'>
+            <span className='min-w-6 text-center text-xl text-neutral-900'>
               {qty}
             </span>
             <Button
               variant='primary'
               size='sm'
-              className='!w-10 !h-10 !rounded-full !px-0 !py-0 leading-none shrink-0'
+              className='!size-8 xl:!size-10 !rounded-full !px-0 !py-0 leading-none shrink-0'
               onClick={inc}
             >
               <Icon

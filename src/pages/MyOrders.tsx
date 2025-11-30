@@ -229,16 +229,19 @@ export default function MyOrders() {
 
   return (
     <>
-      <Container className='py-3xl relative'>
+      <Container className='py-3xl relative md:max-w-[1200px] md:min-h-screen md:flex md:items-center md:justify-center'>
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
               name={profileName || 'User'}
+              onProfile={() => navigate('/profile')}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}
+              onMyReviews={() => navigate('/my-reviews')}
               onLogout={() => navigate('/login')}
               insideDialog={false}
               className='w-full md:w-[240px]'
+              activeItem='my_orders'
             />
           </div>
 
@@ -267,7 +270,7 @@ export default function MyOrders() {
                 ]}
                 value={status}
                 onChange={(v) => setStatus(v as typeof status)}
-                className='w-full md:w-auto bg-white'
+                className='w-full md:w-auto'
                 scrollable
               />
             </div>

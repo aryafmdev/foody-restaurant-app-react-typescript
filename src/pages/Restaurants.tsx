@@ -8,6 +8,7 @@ import { IconButton } from '../ui/icon-button';
 import { RestaurantInfoCard } from '../components';
 import RestaurantFilterDialog, {
   type RestaurantFilters,
+  RestaurantFilterPanel,
 } from '../components/RestaurantFilterDialog';
 import { useAllRestaurantsQuery } from '../services/queries/restaurants';
 import { computeDistanceKm } from '../lib/format';
@@ -146,7 +147,7 @@ export default function Restaurants() {
     });
   }, [withDist, filters]);
   return (
-    <div className='bg-white'>
+    <div className='bg-neutral-100'>
       <Container className='py-2xl'>
         <div className='flex items-center justify-between'>
           <div className='text-display-sm font-extrabold text-neutral-950'>
@@ -159,7 +160,7 @@ export default function Restaurants() {
           </Link>
         </div>
 
-        <div className='mt-xl border border-neutral-100 p-sm rounded-sm flex items-center justify-between'>
+        <div className='mt-xl bg-white p-sm rounded-sm flex items-center justify-between md:hidden'>
           <div className='text-sm font-extrabold text-neutral-950'>FILTER</div>
           <RestaurantFilterDialog
             open={open}
@@ -187,40 +188,50 @@ export default function Restaurants() {
           </div>
         ) : (
           <>
-            <div className='mt-xl grid grid-cols-1 md:grid-cols-3 gap-2xl'>
-              {isLoading
-                ? Array.from({ length: 12 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className='rounded-lg shadow-md md:shadow-lg border-none'
-                    >
-                      <div className='p-xl'>
-                        <div className='flex items-center gap-md'>
-                          <Skeleton className='h-16 w-16 md:h-20 md:w-20 rounded-lg' />
-                          <div className='flex-1 h-16 md:h-20 flex flex-col justify-between'>
-                            <Skeleton className='h-4 w-3/4' />
-                            <Skeleton className='h-4 w-1/3' />
-                            <Skeleton className='h-4 w-2/3' />
+            <div className='mt-4xl grid grid-cols-1 md:grid-cols-[clamp(260px,18vw,320px)_1fr] gap-2xl items-start'>
+              <div className='hidden md:block'>
+                <RestaurantFilterPanel
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                />
+              </div>
+              <div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-2xl'>
+                  {isLoading
+                    ? Array.from({ length: 12 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className='rounded-lg shadow-md md:shadow-lg border-none'
+                        >
+                          <div className='p-xl'>
+                            <div className='flex items-center gap-md'>
+                              <Skeleton className='h-16 w-16 md:h-20 md:w-20 rounded-lg' />
+                              <div className='flex-1 h-16 md:h-20 flex flex-col justify-between'>
+                                <Skeleton className='h-4 w-3/4' />
+                                <Skeleton className='h-4 w-1/3' />
+                                <Skeleton className='h-4 w-2/3' />
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  ))
-                : filteredList.map(({ r, dist }) => (
-                    <Link
-                      key={r.id}
-                      to={`/restaurant/${r.id}`}
-                      className='block'
-                    >
-                      <RecCardAll r={r} distanceKm={dist} />
-                    </Link>
-                  ))}
+                      ))
+                    : filteredList.map(({ r, dist }) => (
+                        <Link
+                          key={r.id}
+                          to={`/restaurant/${r.id}`}
+                          className='block'
+                        >
+                          <RecCardAll r={r} distanceKm={dist} />
+                        </Link>
+                      ))}
+                </div>
+              </div>
             </div>
             <div className='mt-2xl flex justify-center'>
               <Button
                 variant='neutral'
                 size='sm'
-                className='rounded-full px-xl'
+                className='rounded-full px-xl border border-neutral-300'
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               >
                 Back to Top

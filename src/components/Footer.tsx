@@ -8,7 +8,7 @@ import FooterLinkColumn from './FooterLinkColumn';
 export default function Footer() {
   const location = useLocation();
   return (
-    <footer className='bg-neutral-950 text-white py-6xl'>
+    <footer className='bg-neutral-950 text-white px-2xl py-xl md:py-6xl'>
       <Container className='py-2xl'>
         <div className='grid md:grid-cols-3 gap-y-2xl md:items-start'>
           <div className='space-y-2xl md:justify-self-start'>
@@ -86,7 +86,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className='grid grid-cols-2 gap-x-2xl gap-y-2xl md:hidden'>
+          <div className='grid grid-cols-2 gap-x-2xl gap-y-2xl md:hidden justify-self-between'>
             <FooterLinkColumn
               title='Explore'
               links={[

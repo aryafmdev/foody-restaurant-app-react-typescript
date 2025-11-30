@@ -19,7 +19,7 @@ import { Navbar, Footer } from '../components';
 
 export default function App() {
   const location = useLocation();
-  const hideNav = location.pathname === '/login';
+  const hideNav = location.pathname === '/login' || location.pathname === '/success';
   const isHome = location.pathname === '/';
   useEffect(() => {
     if (location.pathname === '/') {
@@ -27,7 +27,7 @@ export default function App() {
     }
   }, [location.pathname]);
   return (
-    <div className='min-h-screen bg-neutral-50 text-neutral-900 flex flex-col'>
+    <div className='min-h-screen bg-neutral-100 text-neutral-900 flex flex-col'>
       {hideNav ? null : (
         <Navbar mode={location.pathname === '/' ? undefined : 'scrolled'} />
       )}

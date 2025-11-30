@@ -7,7 +7,7 @@ import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Alert } from '../ui/alert';
 import { Skeleton } from '../ui/skeleton';
-import { Icon } from '../ui/icon';
+import { SidebarProfile } from '../components';
 import {
   useMyReviewsQuery,
   useUpdateReviewMutation,
@@ -35,7 +35,11 @@ export default function MyReviews() {
   const del = useDeleteReviewMutation();
 
   const [editOpen, setEditOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<{ id: number; star: number; comment?: string } | null>(null);
+  const [editTarget, setEditTarget] = useState<{
+    id: number;
+    star: number;
+    comment?: string;
+  } | null>(null);
   const [editStar, setEditStar] = useState(0);
   const [editComment, setEditComment] = useState('');
   const openEdit = (id: number, star: number, comment?: string) => {
@@ -47,7 +51,11 @@ export default function MyReviews() {
   const submitEdit = () => {
     if (!editTarget) return;
     upd.mutate(
-      { id: editTarget.id, star: editStar, comment: editComment.trim() || undefined },
+      {
+        id: editTarget.id,
+        star: editStar,
+        comment: editComment.trim() || undefined,
+      },
       { onSuccess: () => setEditOpen(false) }
     );
   };
@@ -62,28 +70,31 @@ export default function MyReviews() {
       <Container className='py-3xl'>
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
-            <Card className='rounded-lg shadow-md p-2xl border border-neutral-200'>
-              <CardContent className='p-2xl'>
-                <div className='space-y-5xl'>
-                  <button
-                    type='button'
-                    className='w-full inline-flex items-center gap-md cursor-default'
-                  >
-                    <Icon name='carbon:review' size={24} className='text-neutral-900' />
-                    <span className='text-md font-extrabold text-neutral-900'>My Reviews</span>
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+            <SidebarProfile
+              name={'User'}
+              onProfile={() => navigate('/profile')}
+              onDeliveryAddress={() => navigate('/address')}
+              onMyOrders={() => navigate('/orders')}
+              onMyReviews={() => navigate('/my-reviews')}
+              onLogout={() => navigate('/login')}
+              insideDialog={false}
+              className='w-full md:w-[240px]'
+              activeItem='my_reviews'
+            />
           </div>
 
           <div className='md:col-span-1'>
-            <div className='text-display-md font-extrabold text-neutral-950'>My Reviews</div>
+            <div className='text-display-md font-extrabold text-neutral-950'>
+              My Reviews
+            </div>
 
             {isLoading ? (
               <div className='mt-3xl grid grid-cols-1 md:grid-cols-2 gap-2xl'>
                 {[0, 1, 2, 3].map((i) => (
-                  <Card key={i} className='rounded-lg border-neutral-200 md:shadow-lg'>
+                  <Card
+                    key={i}
+                    className='rounded-lg border-neutral-200 md:shadow-lg'
+                  >
                     <CardContent className='p-2xl space-y-md'>
                       <Skeleton className='h-14 w-14 rounded-full' />
                       <Skeleton className='h-4 w-40' />
@@ -115,7 +126,7 @@ export default function MyReviews() {
                       <Button
                         variant='outline'
                         size='sm'
-                        className='rounded-full hover:bg-accent-green hover:text-white'
+                        className='rounded-full md:w-[20px] hover:bg-accent-green hover:text-white'
                         onClick={() => openEdit(rv.id, rv.star, rv.comment)}
                       >
                         Edit
@@ -123,19 +134,21 @@ export default function MyReviews() {
                       <Button
                         variant='outline'
                         size='sm'
-                        className='rounded-full hover:bg-accent-red hover:text-white'
+                        className='rounded-full md:w-[20px] hover:bg-accent-red hover:text-white'
                         onClick={() => onDelete(rv.id)}
                         disabled={del.isPending}
                       >
                         Delete
                       </Button>
                       <Button
-                        variant='link'
+                        variant='outline'
                         size='sm'
-                        className='rounded-full'
-                        onClick={() => navigate(`/restaurant/${rv.restaurant?.id ?? ''}`)}
+                        className='rounded-full md:hidden lg:inline lg:w-10 hover:bg-primary hover:text-white'
+                        onClick={() =>
+                          navigate(`/restaurant/${rv.restaurant?.id ?? ''}`)
+                        }
                       >
-                        View Restaurant
+                        View
                       </Button>
                     </div>
                   </div>
@@ -171,4 +184,3 @@ export default function MyReviews() {
     </>
   );
 }
-

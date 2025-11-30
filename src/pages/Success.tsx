@@ -51,7 +51,7 @@ export default function Success() {
     .format('D MMMM YYYY, HH:mm');
 
   return (
-    <Container className='h-screen flex flex-col items-center justify-center'>
+    <Container className='h-screen flex flex-col items-center justify-center max-w-[428px]'>
       <div className='flex flex-col items-center'>
         <div className='inline-flex items-center gap-sm'>
           <span
@@ -75,11 +75,7 @@ export default function Success() {
           </span>
         </div>
 
-        <Card
-          className={cn(
-            'mt-2xl rounded-lg border-none w-full md:w-[480px] bg-white'
-          )}
-        >
+        <Card className={cn('mt-2xl rounded-lg border-none w-full bg-white')}>
           <CardContent className='p-xl space-y-2xl'>
             <div className='flex flex-col items-center text-center space-y-xl'>
               <div className='inline-flex items-center justify-center size-12 rounded-full bg-[#44ab09]'>

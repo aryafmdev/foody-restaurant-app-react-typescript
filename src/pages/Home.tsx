@@ -64,21 +64,21 @@ export default function Home() {
   };
   return (
     <>
-      <div className='bg-white'>
+      <div className='bg-neutral-100'>
         <div className='relative'>
           <img
             src={heroImg}
             alt='Foody hero'
-            className='h-[648px] md:h-[420px] w-full object-cover'
+            className='h-[clamp(648px,57.43vw,827px)] w-full object-cover'
           />
           <div className='absolute inset-0 bg-black/50' />
           <div className='absolute inset-0 flex items-center justify-center'>
             <Container>
               <div className='mx-auto max-w-[720px] text-center'>
-                <h1 className='text-display-lg md:text-display-2xl leading-display-2xl font-extrabold text-white'>
+                <h1 className='text-[clamp(2rem,3.33vw,3rem)] leading-display-2xl font-extrabold text-white'>
                   Explore Culinary Experiences
                 </h1>
-                <p className='mt-xs text-lg md:text-display-xs font-bold text-white'>
+                <p className='mt-xs text-[clamp(1rem,4.58vw,1.125rem)] md:text-display-xs font-bold text-white'>
                   Search and refine your choice to discover the perfect
                   restaurant.
                 </p>
@@ -88,7 +88,7 @@ export default function Home() {
                     onChange={setSearch}
                     onSubmit={onSearchSubmit}
                     placeholder='Search restaurants, food and drink'
-                    className='mx-auto text-sm w-[349px] md:w-[604px] [&>input]:h-[48px]'
+                    className='mx-auto text-sm w-[clamp(349px,41.94vw,604px)] h-[clamp(48px,3.88vw,56px)] [&>input]:h-[clamp(48px,3.88vw,56px)]'
                   />
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function Home() {
         </div>
 
         <Container className='py-4xl md:py-6xl'>
-          <div className='grid grid-cols-3 md:grid-cols-6 gap-lg'>
+          <div className='grid grid-cols-3 md:grid-cols-6 gap-lg md:gap-6xl'>
             <CategoryCard
               label='All Restaurant'
               image={catAll}

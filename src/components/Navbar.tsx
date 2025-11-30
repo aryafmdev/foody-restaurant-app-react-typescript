@@ -53,12 +53,12 @@ export default function Navbar({
       : cart?.data?.summary?.totalItems ?? 0;
   const displayName = profile?.data?.name ?? 'John Doe';
 
-  const base = 'fixed top-0 left-0 right-0 z-50 transition-colors';
+  const base = 'fixed top-0 left-0 right-0 z-50 border-none transition-colors';
   const navClass = cn(
     base,
     isAtTop
       ? 'bg-transparent border-none text-white'
-      : 'bg-white text-neutral-950'
+      : 'bg-white border-none text-neutral-950'
   );
   const btnOutlineTop = 'border border-white text-white hover:bg-white/10';
   const btnSolidTop = 'bg-white text-neutral-950 hover:opacity-95';
@@ -68,23 +68,17 @@ export default function Navbar({
   const dispatch = useDispatch();
   const qc = useQueryClient();
   const [profileOpen, setProfileOpen] = useState(false);
+  const currentActiveItem = location.pathname.startsWith('/profile')
+    ? 'profile'
+    : location.pathname.startsWith('/address')
+    ? 'delivery_address'
+    : location.pathname.startsWith('/orders')
+    ? 'my_orders'
+    : location.pathname.startsWith('/my-reviews')
+    ? 'my_reviews'
+    : undefined;
 
   const navRef = useRef<HTMLElement | null>(null);
-  const [navHeight, setNavHeight] = useState<number>(() =>
-    typeof window !== 'undefined' && window.innerWidth >= 768 ? 64 : 56
-  );
-  const [isMobile, setIsMobile] = useState<boolean>(() =>
-    typeof window !== 'undefined' ? window.innerWidth < 768 : true
-  );
-  useEffect(() => {
-    const onResize = () => {
-      const w = window.innerWidth;
-      setNavHeight(w >= 768 ? 64 : 56);
-      setIsMobile(w < 768);
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
   return (
     <nav className={navClass} ref={navRef}>
       <Container className='flex items-center justify-between py-sm md:py-md'>
@@ -128,7 +122,7 @@ export default function Navbar({
         </Link>
 
         {isLoggedIn ? (
-          <div className='flex items-center gap-sm md:gap-md'>
+          <div className='flex items-center gap-sm md:gap-4xl'>
             <IconButton
               aria-label='Cart'
               variant='bare'
@@ -186,47 +180,54 @@ export default function Navbar({
         )}
       </Container>
 
-          <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-            <DialogContent side='right' offsetTop={isMobile ? 0 : navHeight}>
-              <SidebarProfile
-                name={displayName}
-                onProfile={() => {
-                  setProfileOpen(false);
-                  navigate('/profile');
-                }}
-                onDeliveryAddress={() => {
-                  setProfileOpen(false);
-                  navigate('/address');
-                }}
-                onMyOrders={() => {
-                  setProfileOpen(false);
-                  navigate('/orders');
-                }}
-                onMyReviews={() => {
-                  setProfileOpen(false);
-                  navigate('/my-reviews');
-                }}
-                onLogout={() => {
-                  setProfileOpen(false);
-                  try {
-                    sessionStorage.removeItem('auth');
-                  } catch {
-                    void 0;
-                  }
-                  try {
-                    localStorage.removeItem('auth');
-                  } catch {
-                    void 0;
-                  }
-                  dispatch(setToken(null));
-                  dispatch(setUserId(null));
-                  dispatch(clearCart());
-                  qc.clear();
-                  navigate('/login');
-                }}
-              />
-            </DialogContent>
-          </Dialog>
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent side='right' offsetTop={0}>
+          <SidebarProfile
+            name={displayName}
+            onProfile={() => {
+              setProfileOpen(false);
+              navigate('/profile');
+            }}
+            onDeliveryAddress={() => {
+              setProfileOpen(false);
+              navigate('/address');
+            }}
+            onMyOrders={() => {
+              setProfileOpen(false);
+              navigate('/orders');
+            }}
+            onMyReviews={() => {
+              setProfileOpen(false);
+              navigate('/my-reviews');
+            }}
+            onLogout={() => {
+              setProfileOpen(false);
+              try {
+                sessionStorage.removeItem('auth');
+              } catch {
+                void 0;
+              }
+              try {
+                localStorage.removeItem('auth');
+              } catch {
+                void 0;
+              }
+              dispatch(setToken(null));
+              dispatch(setUserId(null));
+              dispatch(clearCart());
+              qc.clear();
+              navigate('/login');
+            }}
+            activeItem={
+              currentActiveItem as
+                | 'profile'
+                | 'delivery_address'
+                | 'my_orders'
+                | 'my_reviews'
+            }
+          />
+        </DialogContent>
+      </Dialog>
     </nav>
   );
 }

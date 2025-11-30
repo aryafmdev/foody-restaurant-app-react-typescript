@@ -130,17 +130,19 @@ export default function Profile() {
 
   return (
     <>
-      <Container className='py-3xl'>
-        <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
+      <Container className='py-3xl relative md:flex md:justify-center'>
+        <div className='relative md:max-w-[1200px] mx-auto md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
               name={displayName}
+              onProfile={() => navigate('/profile')}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}
               onMyReviews={() => navigate('/my-reviews')}
               onLogout={() => navigate('/login')}
               insideDialog={false}
               className='w-full md:w-[240px]'
+              activeItem='profile'
             />
           </div>
 

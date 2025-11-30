@@ -21,15 +21,20 @@ export default function RestaurantInfoCard({
 }: RestaurantInfoCardProps) {
   const imgSrc = logo || fallbackImg;
   return (
-    <Card className='rounded-lg shadow-md md:shadow-lg border-none'>
-      <CardContent className='p-xl md:h-[120px]'>
-        <div className='flex items-start gap-md'>
-          <div className='h-16 w-16 md:h-20 md:w-20 rounded-lg overflow-hidden bg-neutral-200 shrink-0'>
-            <Image alt={name} src={imgSrc} fallbackSrc={fallbackImg} className='h-full w-full' />
+    <Card className='rounded-lg border-none'>
+      <CardContent className='p-lg w-full'>
+        <div className='flex items-center gap-md h-full'>
+          <div className='h-[clamp(90px,6.25vw,120px)] w-[clamp(90px,6.25vw,120px)] rounded-lg overflow-hidden bg-neutral-200 shrink-0'>
+            <Image
+              alt={name}
+              src={imgSrc}
+              fallbackSrc={fallbackImg}
+              className='size-full object-cover'
+            />
           </div>
           <div className='flex-1 min-w-0 flex flex-col gap-xxs'>
             <div
-              className='text-sm md:text-md font-extrabold text-neutral-950 break-words'
+              className='text-[clamp(1rem,1.25vw,1.125rem)] font-extrabold text-neutral-950 break-words'
               style={{
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -49,7 +54,7 @@ export default function RestaurantInfoCard({
                 {rating.toFixed(1)}
               </span>
             </div>
-            <div className='text-sm md:text-md text-neutral-950 break-words'>
+            <div className='text-[clamp(0.875rem,1.11vw,1rem)] md:text-md text-neutral-950 break-words'>
               {formatPlaceAndDistance(place ?? 'Jakarta Pusat', distanceKm)}
             </div>
           </div>

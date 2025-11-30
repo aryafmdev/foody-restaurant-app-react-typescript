@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader } from '../ui/card';
 import { Icon } from '../ui/icon';
 import { IconButton } from '../ui/icon-button';
 import { DialogClose } from '../ui/dialog';
+import { cn } from '../lib/cn';
 import avatarImg from '../assets/images/avatar.png';
 import arrowLeft from '../assets/icons/arrow-circle-broken-left.png';
 
@@ -14,6 +15,7 @@ type SidebarProfileProps = {
   onLogout?: () => void;
   className?: string;
   insideDialog?: boolean;
+  activeItem?: 'profile' | 'delivery_address' | 'my_orders' | 'my_reviews';
 };
 
 export default function SidebarProfile({
@@ -25,13 +27,11 @@ export default function SidebarProfile({
   onLogout,
   className,
   insideDialog = true,
+  activeItem,
 }: SidebarProfileProps) {
   return (
     <Card
-      className={[
-        'rounded-lg shadow-md p-2xl border border-neutral-200',
-        className,
-      ]
+      className={['rounded-lg p-2xl border border-neutral-200', className]
         .filter(Boolean)
         .join(' ')}
     >
@@ -74,9 +74,21 @@ export default function SidebarProfile({
             <Icon
               name='mdi:account-outline'
               size={24}
-              className='text-neutral-900 cursor-pointer'
+              className={cn(
+                'cursor-pointer',
+                activeItem === 'profile'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
             />
-            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
+            <span
+              className={cn(
+                'text-md font-medium cursor-pointer',
+                activeItem === 'profile'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
+            >
               Profile
             </span>
           </button>
@@ -88,9 +100,21 @@ export default function SidebarProfile({
             <Icon
               name='mdi:map-marker-outline'
               size={24}
-              className='text-neutral-900 cursor-pointer'
+              className={cn(
+                'cursor-pointer',
+                activeItem === 'delivery_address'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
             />
-            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
+            <span
+              className={cn(
+                'text-md font-medium cursor-pointer',
+                activeItem === 'delivery_address'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
+            >
               Delivery Address
             </span>
           </button>
@@ -102,9 +126,21 @@ export default function SidebarProfile({
             <Icon
               name='akar-icons:file'
               size={24}
-              className='text-neutral-900 cursor-pointer'
+              className={cn(
+                'cursor-pointer',
+                activeItem === 'my_orders'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
             />
-            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
+            <span
+              className={cn(
+                'text-md font-medium cursor-pointer',
+                activeItem === 'my_orders'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
+            >
               My Orders
             </span>
           </button>
@@ -113,8 +149,23 @@ export default function SidebarProfile({
             className='w-full inline-flex items-center gap-md cursor-pointer'
             onClick={onMyReviews}
           >
-            <Icon name='carbon:review' size={24} className='text-neutral-900' />
-            <span className='text-md font-medium text-neutral-900 cursor-pointer'>
+            <Icon
+              name='carbon:review'
+              size={24}
+              className={cn(
+                activeItem === 'my_reviews'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
+            />
+            <span
+              className={cn(
+                'text-md font-medium cursor-pointer',
+                activeItem === 'my_reviews'
+                  ? 'text-primary-100'
+                  : 'text-neutral-900'
+              )}
+            >
               My Reviews
             </span>
           </button>
