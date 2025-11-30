@@ -96,7 +96,7 @@ export default function Home() {
           </div>
         </div>
 
-        <Container className='py-2xl'>
+        <Container className='py-4xl md:py-6xl'>
           <div className='grid grid-cols-3 md:grid-cols-6 gap-lg'>
             <CategoryCard
               label='All Restaurant'

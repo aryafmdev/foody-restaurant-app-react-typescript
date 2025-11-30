@@ -104,8 +104,8 @@
   }
   body {
     margin: 0;
-    color: var(--color-neutral-900);
-    background-color: var(--color-white);
+    color: var(--color-neutral-950);
+    background-color: var(--color-neutral-50);
   }
   h1 {
     font-size: var(--text-display-2xl);
@@ -146,7 +146,7 @@
   p {
     font-size: var(--text-md);
     line-height: var(--leading-text);
-    color: var(--color-neutral-700);
+    color: var(--color-neutral-950);
   }
   a {
     color: var(--color-primary);

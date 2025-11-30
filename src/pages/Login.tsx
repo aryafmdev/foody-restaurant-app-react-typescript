@@ -15,7 +15,7 @@ import {
   useRegisterMutation,
 } from '../services/queries/auth';
 import { setToken, setUserId } from '../features/auth/slice';
-import SegmentedControl from '../components/SegmentedControl';
+import { cn } from '../lib/cn';
 import type { CSSProperties } from 'react';
 
 const LoginSchema = z.object({
@@ -272,17 +272,17 @@ export default function Login() {
   return (
     <div className='min-h-screen'>
       <div className='md:grid md:grid-cols-2'>
-        <div className='hidden md:block bg-neutral-900'>
+        <div className='hidden md:block bg-neutral-950'>
           <Image
             alt='Login'
             src={loginImg}
             className='h-screen w-full object-cover rounded-none'
           />
         </div>
-        <div className='min-h-screen flex items-center justify-center p-2xl'>
+        <div className='min-h-screen flex items-center justify-center p-2xl bg-white'>
           <Card className='border-none shadow-none'>
             <CardContent className='p-none'>
-              <div className='max-w-[360px]'>
+              <div className='max-w-[345px] md:max-w-[374px]'>
                 <div className='inline-flex items-center gap-sm'>
                   <span
                     className='inline-block size-7 bg-primary'
@@ -299,19 +299,39 @@ export default function Login() {
                   Good to see you again! Let's eat
                 </div>
 
-                <div className='mt-xl'>
-                  <SegmentedControl
-                    options={[
-                      { label: 'Sign in', value: 'signin' },
-                      { label: 'Sign up', value: 'signup' },
-                    ]}
-                    value={tab}
-                    onChange={(v) => {
-                      const nv = v as 'signin' | 'signup';
-                      setTab(nv);
-                      navigate(`/login?tab=${nv}`);
-                    }}
-                  />
+                <div className='mt-xl bg-neutral-100 rounded-lg p-md'>
+                  <div className={cn('grid grid-cols-2 gap-sm')}>
+                    <Button
+                      size='sm'
+                      variant='ghost'
+                      className={cn(
+                        'rounded-lg bg-white text-neutral-950 border-none w-full',
+                        tab === 'signin' ? 'font-extrabold' : 'font-medium bg-transparent text-neutral-600'
+                      )}
+                      style={{ borderRadius: '0.5rem' }}
+                      onClick={() => {
+                        setTab('signin');
+                        navigate('/login?tab=signin');
+                      }}
+                    >
+                      Sign in
+                    </Button>
+                    <Button
+                      size='sm'
+                      variant='ghost'
+                      className={cn(
+                        'rounded-lg bg-white text-neutral-950 border-none w-full',
+                        tab === 'signup' ? 'font-extrabold' : 'font-medium bg-transparent text-neutral-600'
+                      )}
+                      style={{ borderRadius: '0.5rem' }}
+                      onClick={() => {
+                        setTab('signup');
+                        navigate('/login?tab=signup');
+                      }}
+                    >
+                      Sign up
+                    </Button>
+                  </div>
                 </div>
 
                 {tab === 'signin' ? (
@@ -326,7 +346,7 @@ export default function Login() {
                           variant={errors.email ? 'error' : 'default'}
                           className='peer placeholder-transparent pt-5'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Email
                         </span>
                       </div>
@@ -346,7 +366,7 @@ export default function Login() {
                           variant={errors.password ? 'error' : 'default'}
                           className='peer placeholder-transparent pt-5 pr-10'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Password
                         </span>
                         <button
@@ -416,7 +436,7 @@ export default function Login() {
                           }
                           className='peer placeholder-transparent pt-5'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Name
                         </span>
                       </div>
@@ -441,7 +461,7 @@ export default function Login() {
                           }
                           className='peer placeholder-transparent pt-5'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Email
                         </span>
                       </div>
@@ -467,7 +487,7 @@ export default function Login() {
                           }
                           className='peer placeholder-transparent pt-5'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Number Phone
                         </span>
                       </div>
@@ -492,7 +512,7 @@ export default function Login() {
                           }
                           className='peer placeholder-transparent pt-5 pr-10'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Password
                         </span>
                         <button
@@ -537,7 +557,7 @@ export default function Login() {
                           }
                           className='peer placeholder-transparent pt-5 pr-10'
                         />
-                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-2 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                        <span className='absolute left-md top-1 text-xs text-neutral-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
                           Confirm Password
                         </span>
                         <button

@@ -57,11 +57,11 @@ export default function Navbar({
   const navClass = cn(
     base,
     isAtTop
-      ? 'bg-transparent text-white'
-      : 'bg-white text-neutral-900 border-b border-neutral-200 shadow-sm'
+      ? 'bg-transparent border-none text-white'
+      : 'bg-white text-neutral-950'
   );
   const btnOutlineTop = 'border border-white text-white hover:bg-white/10';
-  const btnSolidTop = 'bg-white text-neutral-900 hover:opacity-95';
+  const btnSolidTop = 'bg-white text-neutral-950 hover:opacity-95';
 
   const navigate = useNavigate();
   const location = useLocation();
