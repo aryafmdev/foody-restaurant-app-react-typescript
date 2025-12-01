@@ -1,73 +1,154 @@
-# React + TypeScript + Vite
+# 🍽️ Foody Restaurant App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Foody is a modern **restaurant web application** built with **React, Vite, and TypeScript**.  
+It enables users to explore menus, apply filters, search dishes, manage their cart, and complete simple checkouts.  
+Styled with **Tailwind CSS** and **shadcn/ui**, it leverages **Redux Toolkit** for UI state and **TanStack Query** for server data, ensuring fast, responsive, and structured user experiences.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌐 Live Demo
 
-## React Compiler
+👉 Try the application here: [Foody Restaurant App](https://foody-restaurant-app-wine.vercel.app/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Use the following dummy account to log in and explore the features:
 
-## Expanding the ESLint configuration
+- **Email:** `user01@example.com`
+- **Password:** `user1234`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **UI**: React 19, React Router DOM 7, Tailwind CSS 4 (with `@tailwindcss/vite`), Radix UI (Dialog, Select, Tabs, Tooltip)  
+- **State & Data**: Redux Toolkit, React Redux, `@tanstack/react-query` v5, Axios  
+- **Types & Validation**: TypeScript 5.9, Zod  
+- **Icons & Styling**: `@iconify/react`, `lucide-react`, Class Variance Authority (CVA), `tailwind-merge`  
+- **Utilities**: Day.js for dates, currency & formatting helpers  
+- **Tooling**: Vite 7 (dev/build), ESLint 9 (+ react-hooks, react-refresh), `@vitejs/plugin-react`  
+- **API / Backend**: Data powered by **Swagger REST API** (documented endpoints for authentication, restaurants, menus, orders, reviews, and cart)  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ✨ Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 🔐 Authentication & Session
+- Login/logout flow with token persistence  
+- Guarded redirects on unauthorized routes  
+- Session clear and cache reset on logout  
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 🧭 Global Navigation & Layout
+- Sticky Navbar with cart badge & profile drawer (`SidebarProfile`)  
+- Route-aware active state highlighting (text + icon switch to `text-primary-100`)  
+- Consistent page containers with breakpoint-aware `max-w` and centered `md+` layouts  
+
+### 👤 Profile Management
+- View & update profile details (name, phone) with client-side validation  
+- Dialog-based form with error messaging & success feedback  
+
+### 📍 Delivery Address
+- Address card showing phone & address with “Change” action  
+- Responsive card layout (`md:max-w-[1000px]`)  
+
+### 🛒 Cart & Checkout
+- Cart summary & item counts from server cache  
+- Checkout page + Success page (Navbar/Footer hidden per design)  
+
+### 📦 My Orders
+- Orders grouped by restaurant with transaction status & IDs  
+- Search via `SearchBar`, loading skeletons, optimistic placeholders  
+- Status filter via `SegmentedControl` (mobile scrollable, desktop horizontal wrapping)  
+- “Give Review” action per order  
+
+### ⭐ Reviews
+- List user reviews with edit/delete actions (Dialog for edits)  
+- Pagination & load-more behavior with error/empty states  
+
+### 🏪 Restaurant Detail
+- Restaurant information & menu sections aligned with design system components  
+
+### 🎨 Design System Components
+Reusable components:  
+`Card`, `Button`, `IconButton`, `Dialog`, `Input`, `Badge`, `Skeleton`, `Alert`, `EmptyState`,  
+`QuantityStepper`, `OrderSummary`, `AddressSummaryRow`, `MapPinChip`, `SegmentedControl`, `SidebarProfile`  
+- CVA-based variants  
+- Tailwind tokens with consistent spacing & typography  
+
+### 📱 Responsiveness & UX
+- Mobile styling preserved  
+- `md+` layouts follow Figma with two-column grids & centered wrappers (`max-w 1000–1200px`)  
+- Accessible focus states, rounded controls, clear affordances, sane defaults  
+
+---
+
+## 📄 Pages & Flows
+
+- Home (via Navbar)  
+- Restaurant Detail  
+- Login / Signup  
+- Profile  
+- Delivery Address  
+- My Orders  
+- My Reviews  
+- Cart  
+- Checkout  
+- Success  
+
+---
+
+## 🛠️ Development
+
+- **Scripts**:  
+  - `npm run dev` → Development server  
+  - `npm run build` → Production build  
+  - `npm run preview` → Preview build  
+  - `npm run lint` → ESLint checks  
+
+- **Build**: Vite production build with `tsc -b` type checking  
+- **Linting**: ESLint 9 with React hooks & refresh plugins  
+
+---
+
+## 🌟 Showcase
+
+Foody demonstrates how a **scalable, audit-ready frontend architecture** can deliver delightful restaurant experiences:  
+- Clean separation of concerns (UI, State, Data, Utilities)  
+- Strong type safety with TypeScript + Zod  
+- Optimistic UI patterns for smooth UX  
+- Reusable design system components for consistency  
+
+---
+
+## 📸 Preview
+
+> All screenshots are stored in `public/` folder and rendered below.
+
+### 🏠 Home Page  
+![Home Page](/foody-preview-home-page.PNG)
+
+### 🍔 All Restaurants  
+![All Restaurants](/foody-preview-all-restaurant-page.PNG)
+
+### 🛒 Cart Page  
+![Cart Page](/foody-preview-cart-page.PNG)
+
+### 💳 Checkout Page  
+![Checkout Page](/foody-preview-checkout-page.PNG)
+
+### ✅ Success Page  
+![Success Page](/foody-preview-success-page.PNG)
+
+### 🔐 Login Page  
+![Login Page](/foody-preview-login-page.PNG)
+
+### 📦 Orders Page  
+![Orders Page](/foody-preview-orders-page.PNG)
+
+### 🏪 Restaurant Detail  
+![Restaurant Detail](/foody-preview-restaurant-detail-page.PNG)
+
+---
+
+## 🔗 Connect
+
+If you enjoyed this project, feel free to ⭐ the repo and share it!  
+Perfect for showcasing **modern React + TypeScript workflows** with **professional UI/UX design**.
