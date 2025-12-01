@@ -123,28 +123,28 @@ Foody demonstrates how a **scalable, audit-ready frontend architecture** can del
 > All screenshots are stored in `public/` folder and rendered below.
 
 ### 🏠 Home Page  
-![Home Page](public/foody-preview-home-page.png)
+![Home Page](/foody-preview-home-page.png)
 
 ### 🍔 All Restaurants  
-![All Restaurants](public/foody-preview-all-restaurant-page.png)
+![All Restaurants](/foody-preview-all-restaurant-page.png)
 
 ### 🛒 Cart Page  
-![Cart Page](public/foody-preview-cart-page.png)
+![Cart Page](/foody-preview-cart-page.png)
 
 ### 💳 Checkout Page  
-![Checkout Page](public/foody-preview-checkout-page.png)
+![Checkout Page](/foody-preview-checkout-page.png)
 
 ### ✅ Success Page  
-![Success Page](public/foody-preview-success-page.png)
+![Success Page](/foody-preview-success-page.png)
 
 ### 🔐 Login Page  
-![Login Page](public/foody-preview-login-page.png)
+![Login Page](/foody-preview-login-page.png)
 
 ### 📦 Orders Page  
-![Orders Page](public/foody-preview-orders-page.png)
+![Orders Page](/foody-preview-orders-page.png)
 
 ### 🏪 Restaurant Detail  
-![Restaurant Detail](public/foody-preview-restaurant-detail-page.png)
+![Restaurant Detail](/foody-preview-restaurant-detail-page.png)
 
 ---
 
