@@ -12,12 +12,16 @@ export default function Footer() {
       <Container className='py-2xl'>
         <div className='grid md:grid-cols-3 gap-y-2xl md:items-start'>
           <div className='space-y-2xl md:justify-self-start'>
-            <Link to='/' className='inline-flex items-center gap-sm' onClick={(e) => {
-              if (location.pathname === '/') {
-                e.preventDefault();
-                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-              }
-            }}>
+            <Link
+              to='/'
+              className='inline-flex items-center gap-sm'
+              onClick={(e) => {
+                if (location.pathname === '/') {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                }
+              }}
+            >
               <span
                 aria-label='Foody logo'
                 className='inline-block h-8 w-8 bg-primary'
@@ -34,7 +38,9 @@ export default function Footer() {
                   } as CSSProperties
                 }
               />
-              <span className='font-extrabold text-white text-display-md'>Foody</span>
+              <span className='font-extrabold text-white text-display-md'>
+                Foody
+              </span>
             </Link>
             <p className='text-md text-neutral-300'>
               Enjoy homemade flavors & chef's signature dishes, freshly prepared
@@ -135,6 +141,9 @@ export default function Footer() {
               ]}
             />
           </div>
+        </div>
+        <div className='mt-2xl md:mt-4xl text-center text-neutral-400 text-sm'>
+          © 2025 Restaurant Web · Developed by AryaFMDev
         </div>
       </Container>
     </footer>
