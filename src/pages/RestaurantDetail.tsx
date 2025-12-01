@@ -125,7 +125,7 @@ export default function RestaurantDetail() {
   };
 
   return (
-    <div className='bg-white'>
+    <div className='bg-neutral-100'>
       <Container className='py-2xl'>
         <div className='grid grid-cols-1 md:grid-cols-9 gap-md'>
           <div className='block md:hidden'>
