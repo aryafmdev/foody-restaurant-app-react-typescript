@@ -8,6 +8,7 @@ import arrowLeft from '../assets/icons/arrow-circle-broken-left.png';
 
 type SidebarProfileProps = {
   name: string;
+  avatar?: string;
   onProfile?: () => void;
   onDeliveryAddress?: () => void;
   onMyOrders?: () => void;
@@ -20,6 +21,7 @@ type SidebarProfileProps = {
 
 export default function SidebarProfile({
   name,
+  avatar,
   onProfile,
   onDeliveryAddress,
   onMyOrders,
@@ -38,7 +40,7 @@ export default function SidebarProfile({
       <CardHeader className='border-none mb-2xl'>
         <div className='flex items-center justify-between gap-md'>
           <img
-            src={avatarImg}
+            src={avatar || avatarImg}
             alt={name}
             className='h-12 w-12 rounded-full object-cover'
           />

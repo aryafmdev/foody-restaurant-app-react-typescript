@@ -10,6 +10,7 @@ import { useProfileQuery } from '../services/queries/auth';
 
 export default function DeliveryAddress() {
   const token = useSelector((s: RootState) => s.auth.token);
+  const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = !!token;
   const navigate = useNavigate();
   const { data: profile } = useProfileQuery(isLoggedIn);
@@ -31,7 +32,8 @@ export default function DeliveryAddress() {
       <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start  md:flex md:justify-center'>
         <div className='hidden md:block md:w-[240px]'>
           <SidebarProfile
-            name={profile?.data?.name ?? 'User'}
+            name={authUser?.name ?? profile?.data?.name ?? 'User'}
+            avatar={authUser?.avatar ?? profile?.data?.avatar ?? undefined}
             onProfile={() => navigate('/profile')}
             onDeliveryAddress={() => navigate('/address')}
             onMyOrders={() => navigate('/orders')}
@@ -52,7 +54,9 @@ export default function DeliveryAddress() {
             <DeliveryAddressCard
               className='mt-xs'
               address={'Jl. Sudirman No. 10, Jakarta'}
-              phone={profile?.data?.phone ?? '08xx-xxxx-xxxx'}
+              phone={
+                authUser?.phone ?? profile?.data?.phone ?? '08xx-xxxx-xxxx'
+              }
               changeLabel='Change'
               onChange={() => navigate('/profile')}
             />

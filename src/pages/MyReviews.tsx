@@ -20,6 +20,7 @@ import GiveReviewCard from '../components/GiveReviewCard';
 export default function MyReviews() {
   const navigate = useNavigate();
   const token = useSelector((s: RootState) => s.auth.token);
+  const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = !!token;
   useEffect(() => {
     if (!isLoggedIn) navigate('/login?tab=signin&redirect=/my-reviews');
@@ -71,7 +72,8 @@ export default function MyReviews() {
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
-              name={'user'}
+              name={authUser?.name ?? 'User'}
+              avatar={authUser?.avatar ?? undefined}
               onProfile={() => navigate('/profile')}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}

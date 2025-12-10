@@ -15,6 +15,9 @@ export const UserSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   phone: z.string(),
+  avatar: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   createdAt: z.string().optional(),
 });
 

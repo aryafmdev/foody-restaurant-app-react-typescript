@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { setTokenProvider } from '../services/api/http';
-import { setToken, setUserId } from '../features/auth/slice';
+import { setToken, setUserId, setUser } from '../features/auth/slice';
 
 const queryClient = new QueryClient();
 
@@ -18,9 +18,35 @@ try {
   const fromSession = sessionStorage.getItem('auth');
   const raw = fromLocal ?? fromSession;
   if (raw) {
-    const parsed = JSON.parse(raw) as { token?: string; userId?: string };
+    const parsed = JSON.parse(raw) as {
+      token?: string;
+      userId?: string;
+      user?: {
+        id?: string | number;
+        name?: string;
+        email?: string;
+        phone?: string;
+        avatar?: string;
+        latitude?: number;
+        longitude?: number;
+      };
+    };
     if (parsed?.token) store.dispatch(setToken(parsed.token));
     if (parsed?.userId) store.dispatch(setUserId(parsed.userId));
+    if (parsed?.user) {
+      const u = parsed.user;
+      store.dispatch(
+        setUser({
+          id: typeof u.id === 'number' ? String(u.id) : (u.id ?? null),
+          name: u.name ?? null,
+          email: u.email ?? null,
+          phone: u.phone ?? null,
+          avatar: u.avatar ?? null,
+          latitude: u.latitude ?? null,
+          longitude: u.longitude ?? null,
+        })
+      );
+    }
   }
 } catch {
   void 0;

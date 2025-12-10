@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod';
 import { Button } from '../ui/button';
@@ -14,7 +15,7 @@ import {
   useLoginMutation,
   useRegisterMutation,
 } from '../services/queries/auth';
-import { setToken, setUserId } from '../features/auth/slice';
+import { setToken, setUserId, setUser } from '../features/auth/slice';
 import { cn } from '../lib/cn';
 import type { CSSProperties } from 'react';
 
@@ -42,6 +43,7 @@ export default function Login() {
   );
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const qc = useQueryClient();
   const login = useLoginMutation();
   const register = useRegisterMutation();
   const [signupName, setSignupName] = useState('');
@@ -113,14 +115,44 @@ export default function Login() {
       const userId = String(res.data.user.id);
       dispatch(setToken(token));
       dispatch(setUserId(userId));
+      dispatch(
+        setUser({
+          id: String(res.data.user.id),
+          name: res.data.user.name ?? null,
+          email: res.data.user.email ?? null,
+          phone: res.data.user.phone ?? null,
+          avatar: res.data.user.avatar ?? null,
+          latitude: res.data.user.latitude ?? null,
+          longitude: res.data.user.longitude ?? null,
+        })
+      );
       try {
-        sessionStorage.setItem('auth', JSON.stringify({ token, userId }));
+        sessionStorage.setItem(
+          'auth',
+          JSON.stringify({ token, userId, user: res.data.user })
+        );
       } catch {
         void 0;
       }
+      qc.setQueryData(['auth', 'profile'], {
+        success: true,
+        data: {
+          id: res.data.user.id,
+          name: res.data.user.name,
+          email: res.data.user.email,
+          phone: res.data.user.phone,
+          avatar: res.data.user.avatar,
+          latitude: res.data.user.latitude,
+          longitude: res.data.user.longitude,
+          createdAt: res.data.user.createdAt,
+        },
+      });
       if (remember) {
         try {
-          localStorage.setItem('auth', JSON.stringify({ token, userId }));
+          localStorage.setItem(
+            'auth',
+            JSON.stringify({ token, userId, user: res.data.user })
+          );
         } catch {
           void 0;
         }
@@ -157,12 +189,17 @@ export default function Login() {
 
   const onSubmitRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const nameNormalized = signupName.trim();
+    const emailNormalized = signupEmail.trim().toLowerCase();
+    const phoneNormalized = signupPhone.trim();
+    const passwordNormalized = signupPassword.trim();
+    const confirmNormalized = signupConfirm.trim();
     const parsed = RegisterSchema.safeParse({
-      name: signupName,
-      email: signupEmail,
-      phone: signupPhone,
-      password: signupPassword,
-      confirm: signupConfirm,
+      name: nameNormalized,
+      email: emailNormalized,
+      phone: phoneNormalized,
+      password: passwordNormalized,
+      confirm: confirmNormalized,
     });
     if (!parsed.success) {
       const fieldErrors: {
@@ -186,15 +223,50 @@ export default function Login() {
     }
     setSignupErrors({});
     try {
-      await register.mutateAsync({
+      const res = await register.mutateAsync({
         name: parsed.data.name,
-        email: parsed.data.email.toLowerCase(),
+        email: parsed.data.email,
         phone: parsed.data.phone,
         password: parsed.data.password,
       });
-      showToast('Registration successful. Please sign in.', 'success');
-      setTab('signin');
-      setTimeout(() => navigate('/login?tab=signin', { replace: true }), 1200);
+      const token = res.data.token;
+      const userId = String(res.data.user.id);
+      dispatch(setToken(token));
+      dispatch(setUserId(userId));
+      dispatch(
+        setUser({
+          id: String(res.data.user.id),
+          name: res.data.user.name ?? null,
+          email: res.data.user.email ?? null,
+          phone: res.data.user.phone ?? null,
+          avatar: res.data.user.avatar ?? null,
+          latitude: res.data.user.latitude ?? null,
+          longitude: res.data.user.longitude ?? null,
+        })
+      );
+      try {
+        sessionStorage.setItem(
+          'auth',
+          JSON.stringify({ token, userId, user: res.data.user })
+        );
+      } catch {
+        void 0;
+      }
+      qc.setQueryData(['auth', 'profile'], {
+        success: true,
+        data: {
+          id: res.data.user.id,
+          name: res.data.user.name,
+          email: res.data.user.email,
+          phone: res.data.user.phone,
+          avatar: res.data.user.avatar,
+          latitude: res.data.user.latitude,
+          longitude: res.data.user.longitude,
+          createdAt: res.data.user.createdAt,
+        },
+      });
+      showToast('Registration successful. You are now signed in.', 'success');
+      setTimeout(() => navigate('/', { replace: true }), 1200);
     } catch (err) {
       const anyErr = err as unknown as {
         response?: {

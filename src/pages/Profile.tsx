@@ -25,9 +25,10 @@ import { Spinner } from '../ui/spinner';
 export default function Profile() {
   const navigate = useNavigate();
   const token = useSelector((s: RootState) => s.auth.token);
+  const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = !!token;
   const { data: profile, isLoading, error } = useProfileQuery(isLoggedIn);
-  const user = profile?.data;
+  const user = authUser ?? profile?.data;
 
   useEffect(() => {
     if (!isLoggedIn) navigate('/login?tab=signin');
@@ -46,9 +47,13 @@ export default function Profile() {
   const [open, setOpen] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [phoneInput, setPhoneInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [formError, setFormError] = useState('');
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [avatarError, setAvatarError] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [currentError, setCurrentError] = useState('');
@@ -60,6 +65,7 @@ export default function Profile() {
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [origName, setOrigName] = useState('');
   const [origPhone, setOrigPhone] = useState('');
+  const [origEmail, setOrigEmail] = useState('');
   const showToast = (type: 'success' | 'error', msg: string) => {
     setToastType(type);
     setToastMsg(msg);
@@ -71,10 +77,13 @@ export default function Profile() {
     setFormError('');
     setNameError('');
     setPhoneError('');
+    setEmailError('');
+    setAvatarError('');
     setCurrentError('');
     setNewError('');
     const n = nameInput.trim();
     const p = phoneInput.trim();
+    const e = emailInput.trim();
     if (n.length < 2) {
       setNameError('Name must be at least 2 characters');
       showToast('error', 'Name must be at least 2 characters');
@@ -84,6 +93,25 @@ export default function Profile() {
       setPhoneError('Phone must be 10–13 digits');
       showToast('error', 'Phone must be 10–13 digits');
       return;
+    }
+    if (e && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+      setEmailError('Invalid email format');
+      showToast('error', 'Invalid email format');
+      return;
+    }
+    if (avatarFile) {
+      const isImage = (avatarFile.type || '').startsWith('image/');
+      const isSizeOk = avatarFile.size <= 5 * 1024 * 1024;
+      if (!isImage) {
+        setAvatarError('Avatar must be an image');
+        showToast('error', 'Avatar must be an image');
+        return;
+      }
+      if (!isSizeOk) {
+        setAvatarError('Avatar must be <= 5MB');
+        showToast('error', 'Avatar must be <= 5MB');
+        return;
+      }
     }
     if (currentPassword || newPassword) {
       if (currentPassword.length < 6) {
@@ -100,15 +128,19 @@ export default function Profile() {
     try {
       await updateProfile.mutateAsync({
         name: n,
+        email: e || undefined,
         phone: p,
+        avatarFile: avatarFile || undefined,
         currentPassword: currentPassword || undefined,
         newPassword: newPassword || undefined,
       });
       setOpen(false);
       setCurrentPassword('');
       setNewPassword('');
+      setAvatarFile(null);
       const changedPwd = !!(currentPassword || newPassword);
-      const changedProfile = n !== origName || p !== origPhone;
+      const changedProfile =
+        n !== origName || p !== origPhone || e !== origEmail || !!avatarFile;
       const msg =
         changedPwd && changedProfile
           ? 'Profile and password updated successfully'
@@ -135,6 +167,7 @@ export default function Profile() {
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
               name={displayName}
+              avatar={user?.avatar ?? undefined}
               onProfile={() => navigate('/profile')}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}
@@ -159,7 +192,7 @@ export default function Profile() {
                   <div className='space-y-2xl'>
                     <div className='inline-flex items-center gap-sm'>
                       <img
-                        src={avatarImg}
+                        src={user?.avatar || avatarImg}
                         alt={displayName}
                         className='h-12 w-12 rounded-full object-cover'
                       />
@@ -190,13 +223,18 @@ export default function Profile() {
                         onClick={() => {
                           const n0 = user?.name || '';
                           const p0 = user?.phone || '';
+                          const e0 = user?.email || '';
                           setNameInput(n0);
                           setPhoneInput(p0);
+                          setEmailInput(e0);
                           setOrigName(n0);
                           setOrigPhone(p0);
+                          setOrigEmail(e0);
                           setFormError('');
                           setNameError('');
                           setPhoneError('');
+                          setEmailError('');
+                          setAvatarError('');
                           setCurrentError('');
                           setNewError('');
                           setOpen(true);
@@ -217,7 +255,7 @@ export default function Profile() {
         <DialogContent>
           <DialogTitle>Update Profile</DialogTitle>
           <DialogDescription>
-            Change your name and phone number
+            Change your name, email, phone and avatar
           </DialogDescription>
           <div className='mt-xl space-y-xl'>
             <div>
@@ -240,6 +278,26 @@ export default function Profile() {
             <div>
               <div className='relative'>
                 <Input
+                  type='email'
+                  placeholder=' '
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  className='peer placeholder-transparent pt-5'
+                  variant={emailError ? 'error' : 'default'}
+                />
+                <span className='absolute left-md top-1 text-xs text-neutral-950 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                  Email
+                </span>
+                {emailError ? (
+                  <div className='mt-xxs text-sm text-primary'>
+                    {emailError}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            <div>
+              <div className='relative'>
+                <Input
                   placeholder=' '
                   value={phoneInput}
                   onChange={(e) =>
@@ -254,6 +312,29 @@ export default function Profile() {
                 {phoneError ? (
                   <div className='mt-xxs text-sm text-primary'>
                     {phoneError}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            <div>
+              <div className='relative'>
+                <Input
+                  type='file'
+                  accept='image/*'
+                  placeholder=' '
+                  onChange={(e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    setAvatarFile(f);
+                  }}
+                  className='peer placeholder-transparent pt-5'
+                  variant={avatarError ? 'error' : 'default'}
+                />
+                <span className='absolute left-md top-1 text-xs text-neutral-950 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
+                  Avatar
+                </span>
+                {avatarError ? (
+                  <div className='mt-xxs text-sm text-primary'>
+                    {avatarError}
                   </div>
                 ) : null}
               </div>

@@ -31,9 +31,7 @@ export default function MyOrders() {
   const loc = useLocation();
   const token = useSelector((s: RootState) => s.auth.token);
   const userId = useSelector((s: RootState) => s.auth.userId);
-  const profileName = useSelector((s: RootState) => s.auth.userId)
-    ? undefined
-    : undefined;
+  const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = !!token;
 
   useEffect(() => {
@@ -233,7 +231,8 @@ export default function MyOrders() {
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
-              name={profileName || 'User'}
+              name={authUser?.name ?? 'User'}
+              avatar={authUser?.avatar ?? undefined}
               onProfile={() => navigate('/profile')}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}

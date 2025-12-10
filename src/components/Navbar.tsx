@@ -14,7 +14,7 @@ import { useProfileQuery } from '../services/queries/auth';
 import { cn } from '../lib/cn';
 import { Dialog, DialogContent } from '../ui/dialog';
 import SidebarProfile from './SidebarProfile';
-import { setToken, setUserId } from '../features/auth/slice';
+import { setToken, setUserId, setUser } from '../features/auth/slice';
 import { useQueryClient } from '@tanstack/react-query';
 import { clear as clearCart } from '../features/cart/slice';
 
@@ -31,6 +31,7 @@ export default function Navbar({
 }: NavbarProps) {
   const token = useSelector((s: RootState) => s.auth.token);
   const userId = useSelector((s: RootState) => s.auth.userId);
+  const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = typeof loggedIn === 'boolean' ? loggedIn : !!token;
   const [atTop, setAtTop] = useState<boolean>(mode ? mode === 'top' : true);
 
@@ -51,7 +52,7 @@ export default function Navbar({
     typeof cartCountOverride === 'number'
       ? cartCountOverride
       : cart?.data?.summary?.totalItems ?? 0;
-  const displayName = profile?.data?.name ?? 'John Doe';
+  const displayName = authUser?.name ?? profile?.data?.name ?? 'John Doe';
 
   const base = 'fixed top-0 left-0 right-0 z-50 border-none transition-colors';
   const navClass = cn(
@@ -151,7 +152,7 @@ export default function Navbar({
               onClick={() => setProfileOpen(true)}
             >
               <img
-                src={avatarImg}
+                src={authUser?.avatar || profile?.data?.avatar || avatarImg}
                 alt={displayName}
                 className='h-8 w-8 rounded-full'
               />
@@ -184,6 +185,7 @@ export default function Navbar({
         <DialogContent side='right' offsetTop={0}>
           <SidebarProfile
             name={displayName}
+            avatar={authUser?.avatar ?? profile?.data?.avatar ?? undefined}
             onProfile={() => {
               setProfileOpen(false);
               navigate('/profile');
@@ -214,6 +216,7 @@ export default function Navbar({
               }
               dispatch(setToken(null));
               dispatch(setUserId(null));
+              dispatch(setUser(null));
               dispatch(clearCart());
               qc.clear();
               navigate('/login');

@@ -48,9 +48,35 @@ export function useProfileQuery(enabled: boolean = true) {
 export function useUpdateProfileMutation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { name?: string; phone?: string; currentPassword?: string; newPassword?: string }) => {
-      const res = await http.put('/api/auth/profile', body);
-      return ProfileResponseSchema.parse(res.data);
+    mutationFn: async (body: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      avatarFile?: File | Blob | null;
+      currentPassword?: string;
+      newPassword?: string;
+    }) => {
+      const useMultipart = !!body.avatarFile || body.email != null;
+      if (useMultipart) {
+        const form = new FormData();
+        if (body.name != null) form.append('name', body.name);
+        if (body.email != null) form.append('email', body.email);
+        if (body.phone != null) form.append('phone', body.phone);
+        if (body.avatarFile) form.append('avatar', body.avatarFile);
+        const res = await http.put('/api/auth/profile', form, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return ProfileResponseSchema.parse(res.data);
+      } else {
+        const payload = {
+          name: body.name,
+          phone: body.phone,
+          currentPassword: body.currentPassword,
+          newPassword: body.newPassword,
+        };
+        const res = await http.put('/api/auth/profile', payload);
+        return ProfileResponseSchema.parse(res.data);
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['auth', 'profile'] });
