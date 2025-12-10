@@ -206,37 +206,50 @@ export default function Login() {
       const serverMsg = anyErr?.response?.data?.message;
       const errorsRaw = anyErr?.response?.data?.errors;
       const fieldErrors: { [k: string]: string[] } = {};
+      const pushField = (key: string, msgs: string[]) => {
+        if (['name', 'email', 'phone', 'password', 'confirm'].includes(key)) {
+          fieldErrors[key] = [
+            ...(fieldErrors[key] ?? []),
+            ...msgs.filter(Boolean),
+          ];
+        } else {
+          const labeled = msgs.filter(Boolean).map((m) => `${key}: ${m}`);
+          fieldErrors.form = [...(fieldErrors.form ?? []), ...labeled];
+        }
+      };
+      const normalize = (v: unknown): string[] => {
+        if (v == null) return [];
+        if (Array.isArray(v)) return v.flatMap(normalize);
+        const t = typeof v;
+        if (t === 'string') return [v as string];
+        if (t === 'number' || t === 'boolean') return [String(v)];
+        if (t === 'object') {
+          const obj = v as Record<string, unknown>;
+          if ('message' in obj && typeof obj.message === 'string')
+            return [obj.message as string];
+          if ('messages' in obj && Array.isArray(obj.messages))
+            return (obj.messages as unknown[]).flatMap(normalize);
+          return Object.values(obj).flatMap(normalize);
+        }
+        return [String(v)];
+      };
       if (Array.isArray(errorsRaw)) {
-        (errorsRaw as unknown as string[]).forEach((e) => {
-          const msg = String(e);
-          const lower = msg.toLowerCase();
-          if (lower.includes('email'))
-            fieldErrors.email = [...(fieldErrors.email ?? []), msg];
-          else if (lower.includes('phone'))
-            fieldErrors.phone = [...(fieldErrors.phone ?? []), msg];
+        const msgs = (errorsRaw as unknown[]).flatMap(normalize);
+        msgs.forEach((msg) => {
+          const lower = String(msg).toLowerCase();
+          if (lower.includes('email')) pushField('email', [String(msg)]);
+          else if (lower.includes('phone')) pushField('phone', [String(msg)]);
           else if (lower.includes('name') || lower.includes('username'))
-            fieldErrors.name = [...(fieldErrors.name ?? []), msg];
+            pushField('name', [String(msg)]);
           else if (lower.includes('password'))
-            fieldErrors.password = [...(fieldErrors.password ?? []), msg];
-          else fieldErrors.form = [...(fieldErrors.form ?? []), msg];
+            pushField('password', [String(msg)]);
+          else pushField('form', [String(msg)]);
         });
       } else if (errorsRaw && typeof errorsRaw === 'object') {
         Object.entries(errorsRaw as Record<string, unknown>).forEach(
           ([k, v]) => {
-            const key = k as
-              | 'name'
-              | 'email'
-              | 'phone'
-              | 'password'
-              | 'confirm';
-            const val = String(v ?? 'Invalid');
-            if (
-              ['name', 'email', 'phone', 'password', 'confirm'].includes(key)
-            ) {
-              fieldErrors[key] = [...(fieldErrors[key] ?? []), val];
-            } else {
-              fieldErrors.form = [...(fieldErrors.form ?? []), `${k}: ${val}`];
-            }
+            const msgs = normalize(v);
+            pushField(k, msgs.length ? msgs : ['Invalid']);
           }
         );
       }
@@ -252,7 +265,7 @@ export default function Login() {
       const toastMsg =
         serverMsg ??
         (status ? `Registration failed (${status})` : 'Registration failed');
-      const extraList = fieldErrors.form ?? [];
+      const extraList = Object.values(fieldErrors).flat().filter(Boolean);
       const extra = extraList.length ? `\n- ${extraList.join('\n- ')}` : '';
       showToast(toastMsg + extra, 'error');
     }
@@ -306,7 +319,9 @@ export default function Login() {
                       variant='ghost'
                       className={cn(
                         'rounded-lg bg-white text-neutral-950 border-none w-full',
-                        tab === 'signin' ? 'font-extrabold' : 'font-medium bg-transparent text-neutral-600'
+                        tab === 'signin'
+                          ? 'font-extrabold'
+                          : 'font-medium bg-transparent text-neutral-600'
                       )}
                       style={{ borderRadius: '0.5rem' }}
                       onClick={() => {
@@ -321,7 +336,9 @@ export default function Login() {
                       variant='ghost'
                       className={cn(
                         'rounded-lg bg-white text-neutral-950 border-none w-full',
-                        tab === 'signup' ? 'font-extrabold' : 'font-medium bg-transparent text-neutral-600'
+                        tab === 'signup'
+                          ? 'font-extrabold'
+                          : 'font-medium bg-transparent text-neutral-600'
                       )}
                       style={{ borderRadius: '0.5rem' }}
                       onClick={() => {
