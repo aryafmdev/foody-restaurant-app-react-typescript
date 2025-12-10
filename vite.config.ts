@@ -10,7 +10,7 @@ export default defineConfig({
       '/api': {
         target:
           process.env.VITE_API_PROXY_TARGET ||
-          'https://be-restaurant-api-889893107835.asia-southeast2.run.app',
+          'https://restaurant-be-400174736012.asia-southeast2.run.app',
         changeOrigin: true,
         secure: true,
       },
