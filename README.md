@@ -12,8 +12,8 @@ Styled with **Tailwind CSS** and **shadcn/ui**, it leverages **Redux Toolkit** f
 
 Use the following dummy account to log in and explore the features:
 
-- **Email:** `user01@example.com`
-- **Password:** `user1234`
+- **Email:** `joni@example.com`
+- **Password:** `joni123456`
 
 ---
 
