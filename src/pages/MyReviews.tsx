@@ -67,11 +67,11 @@ export default function MyReviews() {
 
   return (
     <>
-      <Container className='py-3xl'>
+      <Container className='py-3xl max-w-[1200px]'>
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
-              name={'User'}
+              name={'user'}
               onProfile={() => navigate('/profile')}
               onDeliveryAddress={() => navigate('/address')}
               onMyOrders={() => navigate('/orders')}
@@ -89,7 +89,7 @@ export default function MyReviews() {
             </div>
 
             {isLoading ? (
-              <div className='mt-3xl grid grid-cols-1 md:grid-cols-2 gap-2xl'>
+              <div className='mt-5xl grid grid-cols-1 md:grid-cols-2 gap-2xl'>
                 {[0, 1, 2, 3].map((i) => (
                   <Card
                     key={i}
@@ -105,11 +105,11 @@ export default function MyReviews() {
                 ))}
               </div>
             ) : isError ? (
-              <div className='mt-2xl'>
+              <div className='mt-5xl'>
                 <Alert variant='error'>Failed to load reviews</Alert>
               </div>
             ) : reviews.length === 0 ? (
-              <div className='mt-3xl'>
+              <div className='mt-5xl'>
                 <Alert variant='info'>You have no reviews yet</Alert>
               </div>
             ) : (

@@ -130,8 +130,8 @@ export default function Profile() {
 
   return (
     <>
-      <Container className='py-3xl relative md:flex md:justify-center'>
-        <div className='relative md:max-w-[1200px] mx-auto md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
+      <Container className='py-3xl max-w-[1200px]'>
+        <div className='relative mx-auto md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile
               name={displayName}
@@ -151,7 +151,7 @@ export default function Profile() {
               Profile
             </div>
 
-            <Card className='mt-5xl rounded-lg shadow-lg border w-full md:w-[524px]'>
+            <Card className='mt-5xl rounded-lg shadow-lg border w-full'>
               <CardContent className='p-xl py-2xl'>
                 {isLoading ? (
                   <div className='text-md text-neutral-950'>Loading...</div>

@@ -229,7 +229,7 @@ export default function MyOrders() {
 
   return (
     <>
-      <Container className='py-3xl relative md:max-w-[1200px] md:flex md:items-center md:justify-center'>
+      <Container className='py-3xl max-w-[1200px]'>
         <div className='md:grid md:grid-cols-[240px_1fr] gap-3xl items-start'>
           <div className='hidden md:block md:w-[240px]'>
             <SidebarProfile

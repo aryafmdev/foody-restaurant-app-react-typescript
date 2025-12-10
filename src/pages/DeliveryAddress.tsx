@@ -48,7 +48,7 @@ export default function DeliveryAddress() {
             Delivery Address
           </div>
 
-          <div className='mt-2xl'>
+          <div className='mt-5xl'>
             <DeliveryAddressCard
               className='mt-xs'
               address={'Jl. Sudirman No. 10, Jakarta'}
