@@ -15,6 +15,9 @@ import RestaurantFilterDialog, {
 import {
   useAllRestaurantsQuery,
   useRestaurantDetailQuery,
+  useRestaurantSearchQuery,
+  useNearbyRestaurantsQuery,
+  useBestSellerRestaurantsQuery,
 } from '../services/queries/restaurants';
 import { computeDistanceKm } from '../lib/format';
 import type {
@@ -67,11 +70,71 @@ export default function Restaurants() {
     priceMin: initialPriceMin,
     priceMax: initialPriceMax,
   });
-  const { data, isLoading, isError } = useAllRestaurantsQuery({
+  const bestSellerParam = sp.get('best');
+  const searchEnabled = !!initialQ;
+  const bestEnabled =
+    !searchEnabled && (bestSellerParam === '1' || bestSellerParam === 'true');
+  const nearbyRange = (() => {
+    const d = initialDistance;
+    if (d === 'nearby') return 1;
+    if (d === '1km') return 1;
+    if (d === '3km') return 3;
+    if (d === '5km') return 5;
+    return undefined;
+  })();
+  const nearbyEnabled = !searchEnabled && !bestEnabled && nearbyRange != null;
+  const allEnabled = !searchEnabled && !bestEnabled && !nearbyEnabled;
+
+  const qSearch = useRestaurantSearchQuery({
     q: initialQ,
+    page: 1,
+    limit: 24,
     lat: userLat,
     long: userLong,
+    enabled: searchEnabled,
   });
+  const qBest = useBestSellerRestaurantsQuery({
+    page: 1,
+    limit: 24,
+    lat: userLat,
+    long: userLong,
+    enabled: bestEnabled,
+  });
+  const qNearby = useNearbyRestaurantsQuery({
+    range: nearbyRange,
+    limit: 24,
+    lat: userLat,
+    long: userLong,
+    enabled: nearbyEnabled,
+  });
+  const qAll = useAllRestaurantsQuery({
+    lat: userLat,
+    long: userLong,
+    enabled: allEnabled,
+  });
+  const data = (
+    searchEnabled
+      ? qSearch.data
+      : bestEnabled
+      ? qBest.data
+      : nearbyEnabled
+      ? qNearby.data
+      : qAll.data
+  ) as RestaurantListResponse | undefined;
+  const isLoading = searchEnabled
+    ? qSearch.isLoading
+    : bestEnabled
+    ? qBest.isLoading
+    : nearbyEnabled
+    ? qNearby.isLoading
+    : qAll.isLoading;
+  const isError = searchEnabled
+    ? qSearch.isError
+    : bestEnabled
+    ? qBest.isError
+    : nearbyEnabled
+    ? qNearby.isError
+    : qAll.isError;
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??

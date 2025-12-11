@@ -4,7 +4,7 @@ import { SearchBar, CategoryCard, RestaurantInfoCard } from '../components';
 import { Container } from '../ui/container';
 import {
   useRecommendedRestaurantsQuery,
-  useRestaurantsQuery,
+  useRestaurantSearchQuery,
   useRestaurantDetailQuery,
 } from '../services/queries/restaurants';
 import { computeDistanceKm } from '../lib/format';
@@ -39,13 +39,14 @@ export default function Home() {
     data: list,
     isLoading: listLoading,
     isError: listError,
-  } = useRestaurantsQuery(
-    searchSubmitted && search.trim()
-      ? { q: search.trim(), page: 1, limit: 12, lat: userLat, long: userLong }
-      : userLat != null && userLong != null
-      ? { lat: userLat, long: userLong, page: 1, limit: 12 }
-      : undefined
-  );
+  } = useRestaurantSearchQuery({
+    q: search.trim(),
+    page: 1,
+    limit: 12,
+    lat: userLat,
+    long: userLong,
+    enabled: searchSubmitted && !!search.trim(),
+  });
   const [extraRecommendedCount, setExtraRecommendedCount] = useState(0);
   const recList = rec?.data?.recommendations ?? [];
   const baseCount = 12;
@@ -126,7 +127,7 @@ export default function Home() {
             <CategoryCard
               label='Best Seller'
               image={catBestSeller}
-              onClick={() => navigate('/restaurants?ratings=5')}
+              onClick={() => navigate('/restaurants?best=1')}
             />
             <CategoryCard
               label='Delivery'

@@ -19,6 +19,7 @@ export function useRestaurantsQuery(params?: {
   limit?: number;
   lat?: number;
   long?: number;
+  enabled?: boolean;
 }) {
   return useQuery({
     queryKey: ['restaurants', 'list', params ?? {}],
@@ -32,6 +33,7 @@ export function useRestaurantsQuery(params?: {
       });
       return RestaurantListResponseSchema.parse(res.data);
     },
+    enabled: params?.enabled ?? true,
   });
 }
 
@@ -76,6 +78,7 @@ export function useRestaurantDetailQuery(
     limitReview?: number;
     lat?: number;
     long?: number;
+    enabled?: boolean;
   }
 ) {
   return useQuery({
@@ -90,7 +93,7 @@ export function useRestaurantDetailQuery(
       });
       return RestaurantDetailResponseSchema.parse(res.data);
     },
-    enabled: !!id,
+    enabled: !!id && (params?.enabled ?? true),
   });
 }
 
@@ -101,6 +104,7 @@ export function useAllRestaurantsQuery(params?: {
   rating?: number;
   lat?: number;
   long?: number;
+  enabled?: boolean;
 }) {
   return useQuery({
     queryKey: ['restaurants', 'all', params ?? {}],
@@ -145,5 +149,94 @@ export function useAllRestaurantsQuery(params?: {
         },
       });
     },
+    enabled: params?.enabled ?? true,
+  });
+}
+
+export function useNearbyRestaurantsQuery(params?: {
+  range?: number;
+  limit?: number;
+  lat?: number;
+  long?: number;
+  enabled?: boolean;
+}) {
+  return useQuery({
+    queryKey: ['restaurants', 'nearby', params ?? {}],
+    queryFn: async () => {
+      const res = await http.get('/api/resto/nearby', {
+        params: {
+          range: params?.range ?? 10,
+          limit: params?.limit ?? 24,
+          lat: params?.lat ?? FALLBACK_LAT,
+          long: params?.long ?? FALLBACK_LONG,
+        },
+      });
+      const arr =
+        (res.data as { data?: { restaurants?: unknown[] } })?.data
+          ?.restaurants ?? [];
+      return RestaurantListResponseSchema.parse({
+        success: true,
+        data: {
+          restaurants: arr,
+          pagination: {
+            page: 1,
+            limit: (params?.limit ?? arr.length) || arr.length,
+            total: arr.length,
+            totalPages: 1,
+          },
+        },
+      });
+    },
+    enabled: params?.enabled ?? true,
+  });
+}
+
+export function useBestSellerRestaurantsQuery(params?: {
+  page?: number;
+  limit?: number;
+  lat?: number;
+  long?: number;
+  enabled?: boolean;
+}) {
+  return useQuery({
+    queryKey: ['restaurants', 'best_seller', params ?? {}],
+    queryFn: async () => {
+      const res = await http.get('/api/resto/best-seller', {
+        params: {
+          page: params?.page ?? 1,
+          limit: params?.limit ?? 24,
+          lat: params?.lat ?? FALLBACK_LAT,
+          long: params?.long ?? FALLBACK_LONG,
+        },
+      });
+      return RestaurantListResponseSchema.parse(res.data);
+    },
+    enabled: params?.enabled ?? true,
+  });
+}
+
+export function useRestaurantSearchQuery(params?: {
+  q?: string;
+  page?: number;
+  limit?: number;
+  lat?: number;
+  long?: number;
+  enabled?: boolean;
+}) {
+  return useQuery({
+    queryKey: ['restaurants', 'search', params ?? {}],
+    queryFn: async () => {
+      const res = await http.get('/api/resto/search', {
+        params: {
+          q: params?.q ?? '',
+          page: params?.page ?? 1,
+          limit: params?.limit ?? 24,
+          lat: params?.lat ?? FALLBACK_LAT,
+          long: params?.long ?? FALLBACK_LONG,
+        },
+      });
+      return RestaurantListResponseSchema.parse(res.data);
+    },
+    enabled: (params?.enabled ?? true) && !!(params?.q ?? '').trim(),
   });
 }
