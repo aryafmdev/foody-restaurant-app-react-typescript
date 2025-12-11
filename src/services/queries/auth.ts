@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { http } from '../api/http';
 import { z } from 'zod';
-import { UserSchema } from '../../types/schemas';
+import { UserSchema, SuccessEnvelopeSchema } from '../../types/schemas';
 
 const RegisterResponseSchema = z.object({
   success: z.boolean(),
@@ -14,6 +14,7 @@ const LoginResponseSchema = z.object({
 });
 
 const ProfileResponseSchema = z.object({ success: z.boolean(), message: z.string().optional(), data: UserSchema });
+const ProfileUpdateResponseSchema = SuccessEnvelopeSchema.or(ProfileResponseSchema);
 
 export function useRegisterMutation() {
   return useMutation({
@@ -63,10 +64,8 @@ export function useUpdateProfileMutation() {
         if (body.email != null) form.append('email', body.email);
         if (body.phone != null) form.append('phone', body.phone);
         if (body.avatarFile) form.append('avatar', body.avatarFile);
-        const res = await http.put('/api/auth/profile', form, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        return ProfileResponseSchema.parse(res.data);
+        const res = await http.put('/api/auth/profile', form);
+        return ProfileUpdateResponseSchema.parse(res.data);
       } else {
         const payload = {
           name: body.name,
@@ -75,7 +74,7 @@ export function useUpdateProfileMutation() {
           newPassword: body.newPassword,
         };
         const res = await http.put('/api/auth/profile', payload);
-        return ProfileResponseSchema.parse(res.data);
+        return ProfileUpdateResponseSchema.parse(res.data);
       }
     },
     onSuccess: () => {

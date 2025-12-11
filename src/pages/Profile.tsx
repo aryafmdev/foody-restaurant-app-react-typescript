@@ -5,7 +5,7 @@ import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { SidebarProfile } from '../components';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import avatarImg from '../assets/images/avatar.png';
 import {
   useProfileQuery,
@@ -21,10 +21,14 @@ import {
 import { Input } from '../ui/input';
 import { Icon } from '../ui/icon';
 import { Spinner } from '../ui/spinner';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../features/auth/slice';
 
 export default function Profile() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const token = useSelector((s: RootState) => s.auth.token);
+  const userId = useSelector((s: RootState) => s.auth.userId);
   const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = !!token;
   const { data: profile, isLoading, error } = useProfileQuery(isLoggedIn);
@@ -48,12 +52,10 @@ export default function Profile() {
   const [nameInput, setNameInput] = useState('');
   const [phoneInput, setPhoneInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [formError, setFormError] = useState('');
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [avatarError, setAvatarError] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [currentError, setCurrentError] = useState('');
@@ -73,12 +75,110 @@ export default function Profile() {
     setTimeout(() => setToastOpen(false), 3000);
   };
 
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const [avatarChangePending, setAvatarChangePending] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
+  const onClickChangeAvatar = () => {
+    setAvatarError('');
+    avatarInputRef.current?.click();
+  };
+  const onChangeAvatarFile: React.ChangeEventHandler<HTMLInputElement> = async (
+    e
+  ) => {
+    const f = e.target.files?.[0] ?? null;
+    if (!f) return;
+    setAvatarError('');
+    const isImage = (f.type || '').startsWith('image/');
+    const isSizeOk = f.size <= 5 * 1024 * 1024;
+    if (!isImage) {
+      setAvatarError('Avatar must be an image');
+      showToast('error', 'Avatar must be an image');
+      e.target.value = '';
+      return;
+    }
+    if (!isSizeOk) {
+      setAvatarError('Avatar must be <= 5MB');
+      showToast('error', 'Avatar must be <= 5MB');
+      e.target.value = '';
+      return;
+    }
+    try {
+      setAvatarChangePending(true);
+      const res = await updateProfile.mutateAsync({ avatarFile: f });
+      const resp = res as unknown as {
+        data?: unknown;
+        message?: string;
+        success?: boolean;
+      };
+      const serverDataRaw = resp?.data;
+      const asObj = (v: unknown): Record<string, unknown> =>
+        v && typeof v === 'object' ? (v as Record<string, unknown>) : {};
+      const asStr = (v: unknown): string | undefined =>
+        typeof v === 'string' ? (v as string) : undefined;
+      const root = asObj(serverDataRaw);
+      const userObj = asObj(root['user']);
+      const dataObj = asObj(root['data']);
+      const nestedUserObj = asObj(dataObj['user']);
+      const nextAvatar: string | undefined =
+        asStr(root['avatar']) ??
+        asStr(userObj['avatar']) ??
+        asStr(dataObj['avatar']) ??
+        asStr(nestedUserObj['avatar']) ??
+        URL.createObjectURL(f);
+      const nextUser = {
+        id: String(root['id'] ?? authUser?.id ?? ''),
+        name: asStr(root['name']) ?? authUser?.name ?? null,
+        email: asStr(root['email']) ?? authUser?.email ?? null,
+        phone: asStr(root['phone']) ?? authUser?.phone ?? null,
+        avatar: nextAvatar ?? null,
+        latitude:
+          (typeof root['latitude'] === 'number'
+            ? (root['latitude'] as number)
+            : authUser?.latitude ?? null) ?? null,
+        longitude:
+          (typeof root['longitude'] === 'number'
+            ? (root['longitude'] as number)
+            : authUser?.longitude ?? null) ?? null,
+      };
+      dispatch(setUser(nextUser));
+      try {
+        const storedRaw =
+          localStorage.getItem('auth') ?? sessionStorage.getItem('auth');
+        const stored = storedRaw ? JSON.parse(storedRaw) : {};
+        const tokenStored = stored?.token ?? token;
+        const userIdStored = stored?.userId ?? userId;
+        const payload = {
+          token: tokenStored,
+          userId: userIdStored,
+          user: { ...stored?.user, ...nextUser },
+        };
+        if (localStorage.getItem('auth'))
+          localStorage.setItem('auth', JSON.stringify(payload));
+        else sessionStorage.setItem('auth', JSON.stringify(payload));
+      } catch {
+        void 0;
+      }
+      showToast('success', 'Avatar updated successfully');
+    } catch (err) {
+      const anyErr = err as {
+        response?: { data?: { message?: string; errors?: string[] } };
+      };
+      const msg = anyErr?.response?.data?.message ?? 'Update failed, image file max 5MB';
+      const errs = anyErr?.response?.data?.errors ?? [];
+      const full = [msg, ...errs].filter(Boolean).join(' • ');
+      setAvatarError(full);
+      showToast('error', full);
+    } finally {
+      setAvatarChangePending(false);
+      e.target.value = '';
+    }
+  };
+
   const onSave = async () => {
     setFormError('');
     setNameError('');
     setPhoneError('');
     setEmailError('');
-    setAvatarError('');
     setCurrentError('');
     setNewError('');
     const n = nameInput.trim();
@@ -99,20 +199,6 @@ export default function Profile() {
       showToast('error', 'Invalid email format');
       return;
     }
-    if (avatarFile) {
-      const isImage = (avatarFile.type || '').startsWith('image/');
-      const isSizeOk = avatarFile.size <= 5 * 1024 * 1024;
-      if (!isImage) {
-        setAvatarError('Avatar must be an image');
-        showToast('error', 'Avatar must be an image');
-        return;
-      }
-      if (!isSizeOk) {
-        setAvatarError('Avatar must be <= 5MB');
-        showToast('error', 'Avatar must be <= 5MB');
-        return;
-      }
-    }
     if (currentPassword || newPassword) {
       if (currentPassword.length < 6) {
         setCurrentError('Current password must be at least 6 characters');
@@ -130,17 +216,26 @@ export default function Profile() {
         name: n,
         email: e || undefined,
         phone: p,
-        avatarFile: avatarFile || undefined,
         currentPassword: currentPassword || undefined,
         newPassword: newPassword || undefined,
       });
+      dispatch(
+        setUser({
+          id: String(user?.id ?? ''),
+          name: n,
+          email: (e || undefined) ?? user?.email ?? null,
+          phone: p,
+          avatar: user?.avatar ?? null,
+          latitude: user?.latitude ?? null,
+          longitude: user?.longitude ?? null,
+        })
+      );
       setOpen(false);
       setCurrentPassword('');
       setNewPassword('');
-      setAvatarFile(null);
       const changedPwd = !!(currentPassword || newPassword);
       const changedProfile =
-        n !== origName || p !== origPhone || e !== origEmail || !!avatarFile;
+        n !== origName || p !== origPhone || e !== origEmail;
       const msg =
         changedPwd && changedProfile
           ? 'Profile and password updated successfully'
@@ -194,8 +289,38 @@ export default function Profile() {
                       <img
                         src={user?.avatar || avatarImg}
                         alt={displayName}
-                        className='h-12 w-12 rounded-full object-cover'
+                        className='size-30 rounded-full object-cover'
                       />
+                    </div>
+                    <div className='flex items-center gap-sm'>
+                      <input
+                        ref={avatarInputRef}
+                        type='file'
+                        accept='image/*'
+                        className='hidden'
+                        onChange={onChangeAvatarFile}
+                      />
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='rounded-full'
+                        onClick={onClickChangeAvatar}
+                        disabled={avatarChangePending}
+                      >
+                        {avatarChangePending ? (
+                          <span className='inline-flex items-center gap-xxs'>
+                            <Spinner size={16} />
+                            Changing...
+                          </span>
+                        ) : (
+                          'Change Avatar'
+                        )}
+                      </Button>
+                      {avatarError ? (
+                        <span className='text-sm text-primary'>
+                          {avatarError}
+                        </span>
+                      ) : null}
                     </div>
                     <div className='grid grid-cols-2 gap-y-4xl'>
                       <div className='text-md text-neutral-950'>Name</div>
@@ -312,29 +437,6 @@ export default function Profile() {
                 {phoneError ? (
                   <div className='mt-xxs text-sm text-primary'>
                     {phoneError}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <div>
-              <div className='relative'>
-                <Input
-                  type='file'
-                  accept='image/*'
-                  placeholder=' '
-                  onChange={(e) => {
-                    const f = e.target.files?.[0] ?? null;
-                    setAvatarFile(f);
-                  }}
-                  className='peer placeholder-transparent pt-5'
-                  variant={avatarError ? 'error' : 'default'}
-                />
-                <span className='absolute left-md top-1 text-xs text-neutral-950 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-md peer-focus:top-1 peer-focus:-translate-y-0 peer-focus:text-xs'>
-                  Avatar
-                </span>
-                {avatarError ? (
-                  <div className='mt-xxs text-sm text-primary'>
-                    {avatarError}
                   </div>
                 ) : null}
               </div>
