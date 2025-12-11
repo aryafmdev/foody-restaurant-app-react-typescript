@@ -51,7 +51,7 @@ export default function ProductCard({
           className='h-full w-full rounded-none object-cover'
         />
       </CardHeader>
-      <CardContent className='p-lg md:p-2xl h-full flex flex-col md:flex-row md:items-center md:justify-between'>
+      <CardContent className='p-lg md:p-2xl flex flex-col md:flex-row md:items-center md:justify-between'>
         <div className='flex flex-col gap-md'>
           <div>
             <div className='mt-lg text-sm font-medium md:text-md text-neutral-950 line-clamp-1'>
