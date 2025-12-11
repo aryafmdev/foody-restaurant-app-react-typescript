@@ -5,6 +5,7 @@ import { Container } from '../ui/container';
 import {
   useRecommendedRestaurantsQuery,
   useRestaurantsQuery,
+  useRestaurantDetailQuery,
 } from '../services/queries/restaurants';
 import { computeDistanceKm } from '../lib/format';
 import type { RestaurantListItem } from '../types/schemas';
@@ -286,33 +287,27 @@ function RecCard({ r }: { r: RestaurantListItem }) {
   const coords = anyR.coordinates;
   const lat = coords?.lat ?? anyR.lat;
   const long = coords?.long ?? anyR.long;
-  const fallbackDistFor = (idOrName: number | string | undefined) => {
-    const key =
-      typeof idOrName === 'number' ? idOrName : String(idOrName ?? 'x');
-    const buckets = [0.8, 1.2, 2.1, 2.8, 3.6, 4.7, 5.3];
-    const idx =
-      typeof key === 'number'
-        ? key % buckets.length
-        : Array.from(String(key)).reduce(
-            (a, c) => (a * 31 + c.charCodeAt(0)) % buckets.length,
-            0
-          );
-    return buckets[idx];
-  };
-  const useBackendDistance =
-    typeof anyR.distance === 'number' &&
-    isFinite(anyR.distance) &&
-    anyR.distance >= 0;
+  const backendDist =
+    typeof anyR.distance === 'number' && isFinite(anyR.distance)
+      ? anyR.distance
+      : undefined;
+  const { data: detail } = useRestaurantDetailQuery(anyR.id, {
+    lat: baseLat,
+    long: baseLong,
+  });
+  const dc = detail?.data?.coordinates;
   const hasCoords =
     typeof lat === 'number' &&
     isFinite(lat!) &&
     typeof long === 'number' &&
     isFinite(long!);
-  const d = useBackendDistance
-    ? (anyR.distance as number)
-    : hasCoords
-    ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
-    : fallbackDistFor(anyR.id ?? anyR.name);
+  const d =
+    backendDist ??
+    (hasCoords
+      ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
+      : dc?.lat != null && dc?.long != null
+      ? computeDistanceKm(baseLat, baseLong, dc.lat, dc.long)
+      : undefined);
   return (
     <RestaurantInfoCard
       name={anyR.name}

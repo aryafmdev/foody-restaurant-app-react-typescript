@@ -12,7 +12,10 @@ import RestaurantFilterDialog, {
   type RestaurantFilters,
   RestaurantFilterPanel,
 } from '../components/RestaurantFilterDialog';
-import { useAllRestaurantsQuery } from '../services/queries/restaurants';
+import {
+  useAllRestaurantsQuery,
+  useRestaurantDetailQuery,
+} from '../services/queries/restaurants';
 import { computeDistanceKm } from '../lib/format';
 import type {
   RestaurantListItem,
@@ -23,8 +26,10 @@ export default function Restaurants() {
   const [open, setOpen] = useState(false);
   const [sp] = useSearchParams();
   const authUser = useSelector((s: RootState) => s.auth.user);
-  const userLat = typeof authUser?.latitude === 'number' ? authUser!.latitude : undefined;
-  const userLong = typeof authUser?.longitude === 'number' ? authUser!.longitude : undefined;
+  const userLat =
+    typeof authUser?.latitude === 'number' ? authUser!.latitude : undefined;
+  const userLong =
+    typeof authUser?.longitude === 'number' ? authUser!.longitude : undefined;
   const initialQ = (() => {
     const q = sp.get('q');
     const s = String(q ?? '').trim();
@@ -62,7 +67,11 @@ export default function Restaurants() {
     priceMin: initialPriceMin,
     priceMax: initialPriceMax,
   });
-  const { data, isLoading, isError } = useAllRestaurantsQuery({ q: initialQ, lat: userLat, long: userLong });
+  const { data, isLoading, isError } = useAllRestaurantsQuery({
+    q: initialQ,
+    lat: userLat,
+    long: userLong,
+  });
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??
@@ -78,33 +87,20 @@ export default function Restaurants() {
       const coords = r.coordinates;
       const lat = coords?.lat ?? r.lat;
       const long = coords?.long ?? r.long;
-      const fallbackDistFor = (idOrName: number | string | undefined) => {
-        const key =
-          typeof idOrName === 'number' ? idOrName : String(idOrName ?? 'x');
-        const buckets = [0.8, 1.2, 2.1, 2.8, 3.6, 4.7, 5.3];
-        const idx =
-          typeof key === 'number'
-            ? key % buckets.length
-            : Array.from(String(key)).reduce(
-                (a, c) => (a * 31 + c.charCodeAt(0)) % buckets.length,
-                0
-              );
-        return buckets[idx];
-      };
-      const hasBackendDistance =
-        typeof r.distance === 'number' &&
-        isFinite(r.distance) &&
-        r.distance >= 0;
+      const backendDist =
+        typeof r.distance === 'number' && isFinite(r.distance)
+          ? r.distance
+          : undefined;
       const hasCoords =
         typeof lat === 'number' &&
         isFinite(lat!) &&
         typeof long === 'number' &&
         isFinite(long!);
-      const dist = hasBackendDistance
-        ? (r.distance as number)
-        : hasCoords
-        ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
-        : fallbackDistFor(r.id ?? r.name);
+      const dist =
+        backendDist ??
+        (hasCoords
+          ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
+          : undefined);
       return { r, dist };
     });
   }, [rawList, userLat, userLong]);
@@ -256,16 +252,21 @@ function RecCardAll({
   const FALLBACK_LAT = -6.175392;
   const FALLBACK_LONG = 106.827153;
   const authUser = useSelector((s: RootState) => s.auth.user);
-  const baseLat = typeof authUser?.latitude === 'number' ? authUser!.latitude : FALLBACK_LAT;
-  const baseLong = typeof authUser?.longitude === 'number' ? authUser!.longitude : FALLBACK_LONG;
+  const baseLat =
+    typeof authUser?.latitude === 'number' ? authUser!.latitude : FALLBACK_LAT;
+  const baseLong =
+    typeof authUser?.longitude === 'number'
+      ? authUser!.longitude
+      : FALLBACK_LONG;
   const anyR = r as RestaurantListItem;
   const coords = anyR.coordinates;
   const lat = coords?.lat ?? anyR.lat;
   const long = coords?.long ?? anyR.long;
-  const useBackendDistance =
-    typeof anyR.distance === 'number' &&
-    isFinite(anyR.distance) &&
-    anyR.distance >= 0;
+  const { data: detail } = useRestaurantDetailQuery(anyR.id, {
+    lat: baseLat,
+    long: baseLong,
+  });
+  const dc = detail?.data?.coordinates;
   const hasCoords =
     typeof lat === 'number' &&
     isFinite(lat!) &&
@@ -273,10 +274,10 @@ function RecCardAll({
     isFinite(long!);
   const d =
     distanceKm ??
-    (useBackendDistance
-      ? (anyR.distance as number)
-      : hasCoords
+    (hasCoords
       ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
+      : dc?.lat != null && dc?.long != null
+      ? computeDistanceKm(baseLat, baseLong, dc.lat, dc.long)
       : undefined);
   return (
     <RestaurantInfoCard

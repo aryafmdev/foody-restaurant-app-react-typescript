@@ -16,6 +16,7 @@ import {
 import { Input } from '../ui/input';
 import { setUser } from '../features/auth/slice';
 import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function DeliveryAddress() {
   const token = useSelector((s: RootState) => s.auth.token);
@@ -24,6 +25,7 @@ export default function DeliveryAddress() {
   const navigate = useNavigate();
   const { data: profile } = useProfileQuery(isLoggedIn);
   const dispatch = useDispatch();
+  const qc = useQueryClient();
 
   const displayName = useMemo(
     () => authUser?.name ?? profile?.data?.name ?? 'User',
@@ -112,7 +114,9 @@ export default function DeliveryAddress() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='rounded-lg p-xl w-[92%] max-w-[460px] mx-auto'>
-          <DialogTitle className='text-display-lg font-extrabold text-neutral-950'>Ubah Alamat</DialogTitle>
+          <DialogTitle className='text-display-lg font-extrabold text-neutral-950'>
+            Ubah Alamat
+          </DialogTitle>
           <DialogDescription>
             Ganti alamat dan koordinat lokasi Anda untuk akurasi jarak restoran
           </DialogDescription>
@@ -154,7 +158,7 @@ export default function DeliveryAddress() {
               <Button
                 variant='neutral'
                 size='sm'
-                className='rounded-full h-8 px-xl md:h-8 md:px-xl border border-neutral-300'
+                className='rounded-full text-xs h-8 px-xl md:h-8 md:px-xl border border-neutral-300'
                 onClick={() => {
                   if (!navigator.geolocation) {
                     setFormError('Geolocation tidak didukung browser Anda');
@@ -172,7 +176,7 @@ export default function DeliveryAddress() {
                   );
                 }}
               >
-                Gunakan Lokasi Perangkat
+                Use Location Device
               </Button>
               <div className='inline-flex items-center gap-sm'>
                 <Button
@@ -181,7 +185,7 @@ export default function DeliveryAddress() {
                   className='rounded-full h-8 px-xl md:h-8 md:px-xl'
                   onClick={() => setOpen(false)}
                 >
-                  Batal
+                  Cancel
                 </Button>
                 <Button
                   variant='primary'
@@ -249,13 +253,30 @@ export default function DeliveryAddress() {
                       } catch {
                         void 0;
                       }
+                      try {
+                        qc.invalidateQueries({ queryKey: ['restaurants'] });
+                        qc.invalidateQueries({
+                          queryKey: ['restaurants', 'list'],
+                        });
+                        qc.invalidateQueries({
+                          queryKey: ['restaurants', 'all'],
+                        });
+                        qc.invalidateQueries({
+                          queryKey: ['restaurants', 'detail'],
+                        });
+                        qc.invalidateQueries({
+                          queryKey: ['restaurants', 'recommended'],
+                        });
+                      } catch {
+                        void 0;
+                      }
                       setOpen(false);
                     } finally {
                       setSaving(false);
                     }
                   }}
                 >
-                  Simpan
+                  Save
                 </Button>
               </div>
             </div>

@@ -117,12 +117,9 @@ export default function RestaurantDetail() {
   const FALLBACK_LONG = 106.827153;
   const baseLat = typeof userLat === 'number' ? userLat : FALLBACK_LAT;
   const baseLong = typeof userLong === 'number' ? userLong : FALLBACK_LONG;
-  const distanceApi = (resto as unknown as { distance?: number }).distance;
   const coords = resto.coordinates;
   const distanceKm =
-    typeof distanceApi === 'number'
-      ? distanceApi
-      : coords?.lat != null && coords?.long != null
+    coords?.lat != null && coords?.long != null
       ? computeDistanceKm(baseLat, baseLong, coords.lat, coords.long)
       : undefined;
 
