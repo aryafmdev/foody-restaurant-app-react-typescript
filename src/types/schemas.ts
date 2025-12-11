@@ -120,6 +120,7 @@ export const TransactionRestaurantItemSchema = z.object({
   price: z.number(),
   quantity: z.number(),
   itemTotal: z.number(),
+  image: z.string().optional(),
 });
 
 export type TransactionRestaurantItem = z.infer<
@@ -146,6 +147,9 @@ export const TransactionSchema = z.object({
   pricing: TransactionPricingSchema.optional(),
   restaurants: z.array(TransactionRestaurantSchema).optional(),
   createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  deliveryAddress: z.string().optional(),
+  phone: z.string().optional(),
 });
 
 export type Transaction = z.infer<typeof TransactionSchema>;

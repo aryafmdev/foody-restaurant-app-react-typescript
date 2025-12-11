@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { http } from '../api/http';
-import { CheckoutResponseSchema, UpdateOrderStatusResponseSchema } from '../../types/schemas';
+import { CheckoutResponseSchema, UpdateOrderStatusResponseSchema, TransactionSchema } from '../../types/schemas';
 import { z } from 'zod';
 import type { Transaction } from '../../types/schemas';
 
 const MyOrdersResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
-    orders: z.array(z.any()),
+    orders: z.array(TransactionSchema),
     pagination: z.object({ page: z.number(), limit: z.number(), total: z.number(), totalPages: z.number() }).optional(),
     filter: z.object({ status: z.string().optional() }).optional(),
   }),
@@ -49,7 +49,16 @@ export function putOrderHistory(userKey: string | null | undefined, tx: Transact
 export function useCheckoutMutation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { paymentMethod?: string }) => {
+    mutationFn: async (body: {
+      paymentMethod?: string;
+      restaurants?: Array<{
+        restaurantId: number;
+        items: Array<{ menuId: number; quantity: number }>;
+      }>;
+      deliveryAddress?: string;
+      phone?: string;
+      notes?: string;
+    }) => {
       const res = await http.post('/api/order/checkout', body);
       return CheckoutResponseSchema.parse(res.data);
     },
