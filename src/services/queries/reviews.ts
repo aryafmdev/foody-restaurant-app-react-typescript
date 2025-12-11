@@ -5,7 +5,13 @@ import { CreateReviewResponseSchema, RestaurantReviewsResponseSchema, MyReviewsR
 export function useCreateReviewMutation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { transactionId: string; restaurantId: number; star: number; comment?: string }) => {
+    mutationFn: async (body: {
+      transactionId: string;
+      restaurantId: number;
+      star: number;
+      comment?: string;
+      menuIds?: number[];
+    }) => {
       const res = await http.post('/api/review', body);
       return CreateReviewResponseSchema.parse(res.data);
     },

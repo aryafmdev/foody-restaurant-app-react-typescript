@@ -66,12 +66,45 @@ export default function MyOrders() {
   const sendReview = () => {
     if (!reviewTarget) return;
     if (rating <= 0) return;
+    const getMenuIds = (): number[] => {
+      const txId = reviewTarget.transactionId;
+      const rid = reviewTarget.restaurantId;
+      const fromGroup = (rs?: TransactionRestaurant[] | undefined) => {
+        const arr = Array.isArray(rs) ? rs : [];
+        const grp = arr.find((r) => (r?.restaurant?.id ?? -1) === rid);
+        const items = Array.isArray(grp?.items) ? grp!.items : [];
+        const ids = items
+          .map((it) => (it as TransactionRestaurantItem)?.menuId)
+          .filter((n) => typeof n === 'number' && Number.isFinite(n));
+        return ids as number[];
+      };
+      // find in server orders
+      const serverOrder = orders.find((o) => o?.transactionId === txId);
+      if (serverOrder) {
+        const ids = fromGroup(serverOrder.restaurants);
+        if (ids.length > 0) return Array.from(new Set(ids));
+      }
+      // find in local history
+      const localTxs = getOrderHistory(userId ?? 'guest');
+      const localOrder = (localTxs ?? []).find((t) => t.transactionId === txId);
+      if (localOrder) {
+        const ids = fromGroup(localOrder.restaurants as TransactionRestaurant[]);
+        if (ids.length > 0) return Array.from(new Set(ids));
+      }
+      // fallback to optimistic tx passed via location state
+      if (tx && tx.transactionId === txId) {
+        const ids = fromGroup(tx.restaurants);
+        if (ids.length > 0) return Array.from(new Set(ids));
+      }
+      return [];
+    };
     createReview.mutate(
       {
         transactionId: reviewTarget.transactionId,
         restaurantId: reviewTarget.restaurantId,
         star: rating,
         comment: comment.trim() || undefined,
+        menuIds: getMenuIds(),
       },
       {
         onSuccess: () => {

@@ -277,6 +277,19 @@ export const ReviewSchema = z.object({
   restaurant: z
     .object({ id: z.number(), name: z.string(), logo: z.string().optional() })
     .optional(),
+  transactionId: z.string().optional(),
+  menus: z
+    .array(
+      z.object({
+        menuId: z.number(),
+        menuName: z.string(),
+        price: z.number(),
+        type: z.string(),
+        image: z.string().optional(),
+        quantity: z.number(),
+      })
+    )
+    .optional(),
 });
 
 export type Review = z.infer<typeof ReviewSchema>;
