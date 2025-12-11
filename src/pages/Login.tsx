@@ -134,6 +134,18 @@ export default function Login() {
       } catch {
         void 0;
       }
+      try {
+        const lat = res.data.user.latitude;
+        const long = res.data.user.longitude;
+        if (typeof lat === 'number' && typeof long === 'number') {
+          localStorage.setItem(
+            'userlocation',
+            JSON.stringify({ latitude: lat, longitude: long })
+          );
+        }
+      } catch {
+        void 0;
+      }
       qc.setQueryData(['auth', 'profile'], {
         success: true,
         data: {
@@ -159,6 +171,7 @@ export default function Login() {
       } else {
         try {
           localStorage.removeItem('auth');
+          localStorage.removeItem('userlocation');
         } catch {
           void 0;
         }
@@ -249,6 +262,18 @@ export default function Login() {
           'auth',
           JSON.stringify({ token, userId, user: res.data.user })
         );
+      } catch {
+        void 0;
+      }
+      try {
+        const lat = res.data.user.latitude;
+        const long = res.data.user.longitude;
+        if (typeof lat === 'number' && typeof long === 'number') {
+          localStorage.setItem(
+            'userlocation',
+            JSON.stringify({ latitude: lat, longitude: long })
+          );
+        }
       } catch {
         void 0;
       }

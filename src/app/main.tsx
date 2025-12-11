@@ -47,6 +47,18 @@ try {
           longitude: u.longitude ?? null,
         })
       );
+      try {
+        const latOk = typeof u.latitude === 'number' && isFinite(u.latitude);
+        const longOk = typeof u.longitude === 'number' && isFinite(u.longitude);
+        if (latOk && longOk) {
+          localStorage.setItem(
+            'userlocation',
+            JSON.stringify({ latitude: u.latitude, longitude: u.longitude })
+          );
+        }
+      } catch {
+        void 0;
+      }
     }
   }
 } catch {

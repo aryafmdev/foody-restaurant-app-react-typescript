@@ -250,6 +250,14 @@ export default function DeliveryAddress() {
                             'auth',
                             JSON.stringify(payload)
                           );
+                        try {
+                          localStorage.setItem(
+                            'userlocation',
+                            JSON.stringify({ latitude: lat, longitude: long })
+                          );
+                        } catch {
+                          void 0;
+                        }
                       } catch {
                         void 0;
                       }
