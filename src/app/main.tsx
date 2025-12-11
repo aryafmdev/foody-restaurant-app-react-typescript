@@ -42,6 +42,7 @@ try {
           email: u.email ?? null,
           phone: u.phone ?? null,
           avatar: u.avatar ?? null,
+          address: (u as { address?: string }).address ?? null,
           latitude: u.latitude ?? null,
           longitude: u.longitude ?? null,
         })

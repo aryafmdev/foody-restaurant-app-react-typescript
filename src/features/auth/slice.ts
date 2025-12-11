@@ -7,6 +7,7 @@ type AuthUser = {
   email?: string | null;
   phone?: string | null;
   avatar?: string | null;
+  address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
 };

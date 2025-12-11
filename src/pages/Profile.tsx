@@ -303,7 +303,7 @@ export default function Profile() {
                       <Button
                         variant='outline'
                         size='sm'
-                        className='rounded-full'
+                        className='rounded-full h-8 px-xl md:h-8 md:px-xl'
                         onClick={onClickChangeAvatar}
                         disabled={avatarChangePending}
                       >
@@ -378,7 +378,7 @@ export default function Profile() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogTitle>Update Profile</DialogTitle>
+          <DialogTitle className='text-display-lg font-extrabold text-neutral-950'>Update Profile</DialogTitle>
           <DialogDescription>
             Change your name, email, phone and avatar
           </DialogDescription>

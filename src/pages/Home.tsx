@@ -9,6 +9,8 @@ import {
 import { computeDistanceKm } from '../lib/format';
 import type { RestaurantListItem } from '../types/schemas';
 import { useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../app/store';
 import heroImg from '../assets/images/hero-image.png';
 import catAll from '../assets/images/all-restaurant.png';
 import catNearby from '../assets/images/nearby.png';
@@ -20,6 +22,11 @@ import catLunch from '../assets/images/lunch.png';
 export default function Home() {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const userLat =
+    typeof authUser?.latitude === 'number' ? authUser!.latitude : undefined;
+  const userLong =
+    typeof authUser?.longitude === 'number' ? authUser!.longitude : undefined;
 
   const {
     data: rec,
@@ -33,7 +40,9 @@ export default function Home() {
     isError: listError,
   } = useRestaurantsQuery(
     searchSubmitted && search.trim()
-      ? { q: search.trim(), page: 1, limit: 12 }
+      ? { q: search.trim(), page: 1, limit: 12, lat: userLat, long: userLong }
+      : userLat != null && userLong != null
+      ? { lat: userLat, long: userLong, page: 1, limit: 12 }
       : undefined
   );
   const [extraRecommendedCount, setExtraRecommendedCount] = useState(0);
@@ -266,6 +275,13 @@ export default function Home() {
 function RecCard({ r }: { r: RestaurantListItem }) {
   const FALLBACK_LAT = -6.175392;
   const FALLBACK_LONG = 106.827153;
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const baseLat =
+    typeof authUser?.latitude === 'number' ? authUser!.latitude : FALLBACK_LAT;
+  const baseLong =
+    typeof authUser?.longitude === 'number'
+      ? authUser!.longitude
+      : FALLBACK_LONG;
   const anyR = r as RestaurantListItem;
   const coords = anyR.coordinates;
   const lat = coords?.lat ?? anyR.lat;
@@ -295,12 +311,7 @@ function RecCard({ r }: { r: RestaurantListItem }) {
   const d = useBackendDistance
     ? (anyR.distance as number)
     : hasCoords
-    ? computeDistanceKm(
-        FALLBACK_LAT,
-        FALLBACK_LONG,
-        lat as number,
-        long as number
-      )
+    ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
     : fallbackDistFor(anyR.id ?? anyR.name);
   return (
     <RestaurantInfoCard

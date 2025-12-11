@@ -21,10 +21,10 @@ import {
   StickyCheckoutBar,
 } from '../components';
 import { useState } from 'react';
-import fallbackImg from '../assets/images/fallback-image.png';
-import { formatPlaceAndDistance, computeDistanceKm } from '../lib/format';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../app/store';
+import fallbackImg from '../assets/images/fallback-image.png';
+import { formatPlaceAndDistance, computeDistanceKm } from '../lib/format';
 import { useNavigate } from 'react-router-dom';
 import type { GetCartResponse } from '../types/schemas';
 
@@ -35,9 +35,16 @@ export default function RestaurantDetail() {
   const [reviewLimit, setReviewLimit] = useState(10);
   const [menuType, setMenuType] = useState<'all' | 'food' | 'drink'>('all');
   const [imgIndex, setImgIndex] = useState(0);
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const userLat =
+    typeof authUser?.latitude === 'number' ? authUser!.latitude : undefined;
+  const userLong =
+    typeof authUser?.longitude === 'number' ? authUser!.longitude : undefined;
   const { data, isLoading, isError } = useRestaurantDetailQuery(id, {
     limitMenu: menuLimit,
     limitReview: reviewLimit,
+    lat: userLat,
+    long: userLong,
   });
   const { data: reviewData } = useRestaurantReviewsQuery(id, {
     page: 1,
@@ -108,13 +115,15 @@ export default function RestaurantDetail() {
     typeof resto.averageRating === 'number' ? resto.averageRating : resto.star;
   const FALLBACK_LAT = -6.175392;
   const FALLBACK_LONG = 106.827153;
+  const baseLat = typeof userLat === 'number' ? userLat : FALLBACK_LAT;
+  const baseLong = typeof userLong === 'number' ? userLong : FALLBACK_LONG;
   const distanceApi = (resto as unknown as { distance?: number }).distance;
   const coords = resto.coordinates;
   const distanceKm =
     typeof distanceApi === 'number'
       ? distanceApi
       : coords?.lat != null && coords?.long != null
-      ? computeDistanceKm(FALLBACK_LAT, FALLBACK_LONG, coords.lat, coords.long)
+      ? computeDistanceKm(baseLat, baseLong, coords.lat, coords.long)
       : undefined;
 
   const share = () => {

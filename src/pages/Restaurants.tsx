@@ -1,5 +1,7 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../app/store';
 
 import { Container } from '../ui/container';
 import { Alert, Skeleton, Button } from '../ui';
@@ -20,6 +22,9 @@ import type {
 export default function Restaurants() {
   const [open, setOpen] = useState(false);
   const [sp] = useSearchParams();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const userLat = typeof authUser?.latitude === 'number' ? authUser!.latitude : undefined;
+  const userLong = typeof authUser?.longitude === 'number' ? authUser!.longitude : undefined;
   const initialQ = (() => {
     const q = sp.get('q');
     const s = String(q ?? '').trim();
@@ -57,7 +62,7 @@ export default function Restaurants() {
     priceMin: initialPriceMin,
     priceMax: initialPriceMax,
   });
-  const { data, isLoading, isError } = useAllRestaurantsQuery({ q: initialQ });
+  const { data, isLoading, isError } = useAllRestaurantsQuery({ q: initialQ, lat: userLat, long: userLong });
   const rawList = useMemo(
     () =>
       ((data as RestaurantListResponse | undefined)?.data?.restaurants ??
@@ -67,6 +72,8 @@ export default function Restaurants() {
   const withDist = useMemo(() => {
     const FALLBACK_LAT = -6.175392;
     const FALLBACK_LONG = 106.827153;
+    const baseLat = typeof userLat === 'number' ? userLat : FALLBACK_LAT;
+    const baseLong = typeof userLong === 'number' ? userLong : FALLBACK_LONG;
     return rawList.map((r) => {
       const coords = r.coordinates;
       const lat = coords?.lat ?? r.lat;
@@ -96,16 +103,11 @@ export default function Restaurants() {
       const dist = hasBackendDistance
         ? (r.distance as number)
         : hasCoords
-        ? computeDistanceKm(
-            FALLBACK_LAT,
-            FALLBACK_LONG,
-            lat as number,
-            long as number
-          )
+        ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
         : fallbackDistFor(r.id ?? r.name);
       return { r, dist };
     });
-  }, [rawList]);
+  }, [rawList, userLat, userLong]);
   const filteredList = useMemo(() => {
     const inDistance = (
       dist: number | undefined,
@@ -253,6 +255,9 @@ function RecCardAll({
 }) {
   const FALLBACK_LAT = -6.175392;
   const FALLBACK_LONG = 106.827153;
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const baseLat = typeof authUser?.latitude === 'number' ? authUser!.latitude : FALLBACK_LAT;
+  const baseLong = typeof authUser?.longitude === 'number' ? authUser!.longitude : FALLBACK_LONG;
   const anyR = r as RestaurantListItem;
   const coords = anyR.coordinates;
   const lat = coords?.lat ?? anyR.lat;
@@ -271,12 +276,7 @@ function RecCardAll({
     (useBackendDistance
       ? (anyR.distance as number)
       : hasCoords
-      ? computeDistanceKm(
-          FALLBACK_LAT,
-          FALLBACK_LONG,
-          lat as number,
-          long as number
-        )
+      ? computeDistanceKm(baseLat, baseLong, lat as number, long as number)
       : undefined);
   return (
     <RestaurantInfoCard
