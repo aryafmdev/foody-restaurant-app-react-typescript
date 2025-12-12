@@ -163,29 +163,57 @@ export function useNearbyRestaurantsQuery(params?: {
   return useQuery({
     queryKey: ['restaurants', 'nearby', params ?? {}],
     queryFn: async () => {
-      const res = await http.get('/api/resto/nearby', {
-        params: {
-          range: params?.range ?? 10,
-          limit: params?.limit ?? 24,
-          lat: params?.lat ?? FALLBACK_LAT,
-          long: params?.long ?? FALLBACK_LONG,
-        },
-      });
-      const arr =
-        (res.data as { data?: { restaurants?: unknown[] } })?.data
-          ?.restaurants ?? [];
-      return RestaurantListResponseSchema.parse({
-        success: true,
-        data: {
-          restaurants: arr,
-          pagination: {
-            page: 1,
-            limit: (params?.limit ?? arr.length) || arr.length,
-            total: arr.length,
-            totalPages: 1,
+      try {
+        const res = await http.get('/api/resto/nearby', {
+          params: {
+            range: params?.range ?? 10,
+            limit: params?.limit ?? 24,
+            lat: params?.lat ?? FALLBACK_LAT,
+            long: params?.long ?? FALLBACK_LONG,
           },
-        },
-      });
+        });
+        const arr =
+          (res.data as { data?: { restaurants?: unknown[] } })?.data
+            ?.restaurants ?? [];
+        return RestaurantListResponseSchema.parse({
+          success: true,
+          data: {
+            restaurants: arr,
+            pagination: {
+              page: 1,
+              limit: (params?.limit ?? arr.length) || arr.length,
+              total: arr.length,
+              totalPages: 1,
+            },
+          },
+        });
+      } catch (err: unknown) {
+        const status = (err as AxiosError)?.response?.status;
+        if (status === 401 || status === 404) {
+          const listRes = await http.get('/api/resto', {
+            params: {
+              page: 1,
+              limit: params?.limit ?? 24,
+              lat: params?.lat ?? FALLBACK_LAT,
+              long: params?.long ?? FALLBACK_LONG,
+            },
+          });
+          return RestaurantListResponseSchema.parse(listRes.data);
+        }
+        try {
+          const listRes = await http.get('/api/resto', {
+            params: {
+              page: 1,
+              limit: params?.limit ?? 24,
+              lat: params?.lat ?? FALLBACK_LAT,
+              long: params?.long ?? FALLBACK_LONG,
+            },
+          });
+          return RestaurantListResponseSchema.parse(listRes.data);
+        } catch {
+          throw err;
+        }
+      }
     },
     enabled: params?.enabled ?? true,
   });
