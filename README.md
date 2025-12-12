@@ -135,37 +135,44 @@ Foody demonstrates how a **scalable, audit-ready frontend architecture** can del
 
 > All screenshots are stored in `public/` folder and rendered below.
 
-### 🏠 Home Page
-
+### 🏠 Home Page  
 ![Home Page](public/foody-preview-home-page.png)
 
-### 🍔 All Restaurants
+### 🍔 All Restaurants Page  
+![All Restaurants Page](public/foody-preview-all-restaurant-page.png)
 
-![All Restaurants](public/foody-preview-all-restaurant-page.png)
+### 🏪 Restaurant Detail Page  
+![Restaurant Detail Page](public/foody-preview-restaurant-detail-page.png)
 
-### 🛒 Cart Page
+### 🏪 Restaurant Detail 2 Page  
+![Restaurant Detail 2 Page](public/foody-preview-restaurant-detail2-page.png)
 
+### 🛒 Cart Page  
 ![Cart Page](public/foody-preview-cart-page.png)
 
-### 💳 Checkout Page
-
+### 💳 Checkout Page  
 ![Checkout Page](public/foody-preview-checkout-page.png)
 
-### ✅ Success Page
-
+### ✅ Success Page  
 ![Success Page](public/foody-preview-success-page.png)
 
-### 🔐 Login Page
-
-![Login Page](public/foody-preview-login-page.png)
-
-### 📦 Orders Page
-
+### 📦 Orders Page  
 ![Orders Page](public/foody-preview-orders-page.png)
 
-### 🏪 Restaurant Detail
+### 🗨️ Reviews Page  
+![Reviews Page](public/foody-preview-reviews-page.png)
 
-![Restaurant Detail](public/foody-preview-restaurant-detail-page.png)
+### 🔐 Login Page  
+![Login Page](public/foody-preview-login-page.png)
+
+### 📝 Register Page  
+![Register Page](public/foody-preview-register-page.png)
+
+### 👤 Profile Page  
+![Profile Page](public/foody-preview-profile-page.png)
+
+### 📍 Address Page  
+![Address Page](public/foody-preview-address-page.png)
 
 ---
 
