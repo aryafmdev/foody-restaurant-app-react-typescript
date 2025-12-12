@@ -1,6 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { useRestaurantDetailQuery } from '../services/queries/restaurants';
-import { useRestaurantReviewsQuery } from '../services/queries/reviews';
+import {
+  useRestaurantReviewsQuery,
+  useMyReviewsQuery,
+} from '../services/queries/reviews';
 import {
   useAddToCartMutation,
   useCartQuery,
@@ -50,6 +53,7 @@ export default function RestaurantDetail() {
     page: 1,
     limit: reviewLimit,
   });
+  const { data: myReviewsData } = useMyReviewsQuery();
   const userId = useSelector((s: RootState) => s.auth.userId);
   const addToCart = useAddToCartMutation(userId ?? 'guest');
   const token = useSelector((s: RootState) => s.auth.token);
@@ -108,9 +112,16 @@ export default function RestaurantDetail() {
         );
   const canShowMoreMenus = (resto.totalMenus ?? 0) > (resto.menus?.length ?? 0);
   const rvList = reviewData?.data?.reviews ?? [];
+  const myRvList = (myReviewsData?.data?.reviews ?? []).filter(
+    (rv) => rv.restaurant?.id === id
+  );
+  const rvIds = new Set(rvList.map((r) => r.id));
+  const mergedRv = rvList.concat(myRvList.filter((r) => !rvIds.has(r.id)));
   const rvStats = reviewData?.data?.statistics;
   const rvPag = reviewData?.data?.pagination;
-  const canShowMoreReviews = (rvPag?.total ?? 0) > rvList.length;
+  const reviewCount =
+    (rvPag?.total ?? rvStats?.totalReviews ?? mergedRv.length) || 0;
+  const canShowMoreReviews = (rvPag?.total ?? 0) > mergedRv.length;
   const ratingValue =
     typeof resto.averageRating === 'number' ? resto.averageRating : resto.star;
   const FALLBACK_LAT = -6.175392;
@@ -393,19 +404,24 @@ export default function RestaurantDetail() {
                   className='text-accent-yellow'
                 />
                 <span className='text-md'>
-                  {ratingValue.toFixed(1)} ({rvStats?.totalReviews ?? 0} Ulasan)
+                  {ratingValue.toFixed(1)} ({reviewCount} Ulasan)
                 </span>
               </div>
             </div>
           </div>
           <div className='mt-xl grid grid-cols-1 md:grid-cols-2 gap-2xl'>
-            {rvList.map((rv) => (
+            {mergedRv.map((rv) => (
               <ReviewCard
                 key={rv.id}
-                name={rv.user?.name ?? 'Anonymous'}
+                name={rv.user?.name ?? authUser?.name ?? 'Anonymous'}
+                avatarUrl={
+                  rv.user?.id != null && String(rv.user.id) !== (userId ?? '')
+                    ? undefined
+                    : authUser?.avatar ?? undefined
+                }
                 rating={rv.star}
                 comment={rv.comment ?? ''}
-                date={rv.createdAt}
+                date={rv.updatedAt ?? rv.createdAt}
               />
             ))}
           </div>

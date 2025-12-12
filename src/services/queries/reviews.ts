@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { http } from '../api/http';
-import { CreateReviewResponseSchema, RestaurantReviewsResponseSchema, MyReviewsResponseSchema, UpdateReviewResponseSchema, DeleteReviewResponseSchema } from '../../types/schemas';
+import {
+  CreateReviewResponseSchema,
+  RestaurantReviewsResponseSchema,
+  MyReviewsResponseSchema,
+  UpdateReviewResponseSchema,
+  DeleteReviewResponseSchema,
+} from '../../types/schemas';
 
 export function useCreateReviewMutation() {
   const qc = useQueryClient();
@@ -15,8 +21,13 @@ export function useCreateReviewMutation() {
       const res = await http.post('/api/review', body);
       return CreateReviewResponseSchema.parse(res.data);
     },
-    onSuccess: () => {
+    onSuccess: (_res, variables) => {
       qc.invalidateQueries({ queryKey: ['reviews', 'my'] });
+      const rid = variables?.restaurantId;
+      if (typeof rid === 'number') {
+        qc.invalidateQueries({ queryKey: ['reviews', 'restaurant', rid] });
+        qc.invalidateQueries({ queryKey: ['restaurants', 'detail', rid] });
+      }
     },
   });
 }
@@ -28,7 +39,9 @@ export function useRestaurantReviewsQuery(
   return useQuery({
     queryKey: ['reviews', 'restaurant', restaurantId, params ?? {}],
     queryFn: async () => {
-      const res = await http.get(`/api/review/restaurant/${restaurantId}`, { params });
+      const res = await http.get(`/api/review/restaurant/${restaurantId}`, {
+        params,
+      });
       return RestaurantReviewsResponseSchema.parse(res.data);
     },
     enabled: !!restaurantId,
@@ -48,12 +61,24 @@ export function useMyReviewsQuery(params?: { page?: number; limit?: number }) {
 export function useUpdateReviewMutation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { id: number; star?: number; comment?: string }) => {
-      const res = await http.put(`/api/review/${payload.id}`, { star: payload.star, comment: payload.comment });
+    mutationFn: async (payload: {
+      id: number;
+      star?: number;
+      comment?: string;
+    }) => {
+      const res = await http.put(`/api/review/${payload.id}`, {
+        star: payload.star,
+        comment: payload.comment,
+      });
       return UpdateReviewResponseSchema.parse(res.data);
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['reviews', 'my'] });
+      const rid = res?.data?.review?.restaurant?.id;
+      if (typeof rid === 'number') {
+        qc.invalidateQueries({ queryKey: ['reviews', 'restaurant', rid] });
+        qc.invalidateQueries({ queryKey: ['restaurants', 'detail', rid] });
+      }
     },
   });
 }
