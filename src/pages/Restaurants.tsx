@@ -175,11 +175,11 @@ export default function Restaurants() {
       f: RestaurantFilters['distance']
     ) => {
       if (!f) return true;
-      if (dist == null || !isFinite(dist)) return false;
+      if (dist == null || !isFinite(dist)) return f === '5km';
       if (f === 'nearby') return dist < 1;
-      if (f === '1km') return dist >= 1 && dist < 3;
-      if (f === '3km') return dist >= 3 && dist < 5;
-      if (f === '5km') return dist >= 5;
+      if (f === '1km') return dist <= 1;
+      if (f === '3km') return dist <= 3;
+      if (f === '5km') return dist <= 5;
       return true;
     };
     const inPrice = (

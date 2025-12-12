@@ -114,7 +114,7 @@ export default function MyOrderCard({
           </div>
           {onGiveReview ? (
             <Button
-              variant='primary'
+              variant={(reviewLabel ?? '').toLowerCase().includes('edit') ? 'success' : 'primary'}
               size='md'
               className='mt-lg md:mt-0 w-full md:w-auto rounded-full h-12'
               onClick={onGiveReview}

@@ -10,6 +10,7 @@ const buttonVariants = cva(
         primary: 'bg-primary-100 text-neutral-25 font-bold hover:opacity-90',
         secondary: 'bg-neutral-300 text-neutral-950 font-bold hover:opacity-90',
         neutral: 'bg-neutral-100 text-neutral-900 font-bold hover:bg-neutral-200',
+        success: 'bg-accent-green text-white font-bold hover:opacity-90',
         danger: 'bg-accent-red text-white font-bold hover:opacity-90',
         outline:
           'border border-neutral-300 text-neutral-900 font-bold hover:bg-neutral-50',
