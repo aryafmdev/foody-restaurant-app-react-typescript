@@ -56,11 +56,13 @@ export default function Restaurants() {
   })();
   const initialPriceMin = (() => {
     const v = sp.get('priceMin');
+    if (v == null || String(v).trim() === '') return undefined;
     const n = Number(v);
     return Number.isFinite(n) && n >= 0 ? n : undefined;
   })();
   const initialPriceMax = (() => {
     const v = sp.get('priceMax');
+    if (v == null || String(v).trim() === '') return undefined;
     const n = Number(v);
     return Number.isFinite(n) && n > 0 ? n : undefined;
   })();
