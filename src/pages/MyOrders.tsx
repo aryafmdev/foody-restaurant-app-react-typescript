@@ -15,7 +15,10 @@ import { SidebarProfile } from '../components';
 import { Icon } from '../ui/icon';
 import { IconButton } from '../ui/icon-button';
 import { useMyOrdersQuery } from '../services/queries/orders';
-import { useCreateReviewMutation } from '../services/queries/reviews';
+import {
+  useCreateReviewMutation,
+  useMyReviewsQuery,
+} from '../services/queries/reviews';
 import { getOrderHistory } from '../services/queries/orders';
 
 import type {
@@ -48,6 +51,7 @@ export default function MyOrders() {
   );
   const { data, isLoading, isError } = useMyOrdersQuery(params);
   const createReview = useCreateReviewMutation();
+  const { data: myReviews } = useMyReviewsQuery();
 
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewTarget, setReviewTarget] = useState<{
@@ -88,7 +92,9 @@ export default function MyOrders() {
       const localTxs = getOrderHistory(userId ?? 'guest');
       const localOrder = (localTxs ?? []).find((t) => t.transactionId === txId);
       if (localOrder) {
-        const ids = fromGroup(localOrder.restaurants as TransactionRestaurant[]);
+        const ids = fromGroup(
+          localOrder.restaurants as TransactionRestaurant[]
+        );
         if (ids.length > 0) return Array.from(new Set(ids));
       }
       // fallback to optimistic tx passed via location state
@@ -123,6 +129,20 @@ export default function MyOrders() {
     pricing?: TransactionPricing;
   };
   const orders = (data?.data?.orders ?? []) as unknown as MyOrder[];
+  const reviewedKeys = useMemo(() => {
+    const arr = myReviews?.data?.reviews ?? [];
+    const ks = arr
+      .map((r) => {
+        const txId = String(
+          (r as { transactionId?: string }).transactionId ?? ''
+        );
+        const rid = (r as { restaurant?: { id?: number } }).restaurant?.id;
+        if (!txId || typeof rid !== 'number') return null;
+        return `${txId}:${rid}`;
+      })
+      .filter(Boolean) as string[];
+    return new Set(ks);
+  }, [myReviews]);
   const tx = (loc.state as unknown as { transaction?: Transaction })
     ?.transaction;
   const optimisticRestaurants = Array.isArray(tx?.restaurants)
@@ -362,6 +382,10 @@ export default function MyOrders() {
                         imageUrl: undefined,
                         quantity: it?.quantity ?? 0,
                       }));
+                      const key = `${String(tx?.transactionId ?? '')}:${String(
+                        rid ?? ''
+                      )}`;
+                      const alreadyReviewed = reviewedKeys.has(key);
                       return (
                         <MyOrderCard
                           key={`optimistic-${String(
@@ -372,7 +396,12 @@ export default function MyOrders() {
                           orderId={tx?.transactionId ?? undefined}
                           status={'preparing'}
                           onGiveReview={() =>
-                            openReview(tx?.transactionId, rid)
+                            alreadyReviewed
+                              ? navigate('/my-reviews')
+                              : openReview(tx?.transactionId, rid)
+                          }
+                          reviewLabel={
+                            alreadyReviewed ? 'Edit Review' : undefined
                           }
                         />
                       );
@@ -398,6 +427,8 @@ export default function MyOrders() {
                           imageUrl: undefined,
                           quantity: it?.quantity ?? 0,
                         }));
+                        const key = `${String(txId)}:${String(rid ?? '')}`;
+                        const alreadyReviewed = reviewedKeys.has(key);
                         return (
                           <MyOrderCard
                             key={`local-${txId}-${i}`}
@@ -406,7 +437,12 @@ export default function MyOrders() {
                             orderId={o?.transactionId}
                             status={String(o?.status ?? '')}
                             onGiveReview={() =>
-                              openReview(o?.transactionId, rid)
+                              alreadyReviewed
+                                ? navigate('/my-reviews')
+                                : openReview(o?.transactionId, rid)
+                            }
+                            reviewLabel={
+                              alreadyReviewed ? 'Edit Review' : undefined
                             }
                           />
                         );
@@ -433,6 +469,8 @@ export default function MyOrders() {
                           imageUrl: (it as { image?: string })?.image,
                           quantity: it?.quantity ?? 0,
                         }));
+                        const key = `${String(txId)}:${String(rid ?? '')}`;
+                        const alreadyReviewed = reviewedKeys.has(key);
                         return (
                           <MyOrderCard
                             key={`${txId}-${i}`}
@@ -441,7 +479,12 @@ export default function MyOrders() {
                             orderId={o?.transactionId}
                             status={String(o?.status ?? '')}
                             onGiveReview={() =>
-                              openReview(o?.transactionId, rid)
+                              alreadyReviewed
+                                ? navigate('/my-reviews')
+                                : openReview(o?.transactionId, rid)
+                            }
+                            reviewLabel={
+                              alreadyReviewed ? 'Edit Review' : undefined
                             }
                           />
                         );
@@ -458,7 +501,7 @@ export default function MyOrders() {
           aria-label='Update Order Status'
           variant='ghost'
           size='none'
-          className='absolute bottom-4 right-4 md:bottom-6 md:right-6 size-10 rounded-full shadow-lg z-10 hover:bg-primary-100'
+          className='hidden absolute bottom-0 right-0 md:bottom-6 md:right-6 size-10 rounded-full shadow-lg z-10 hover:bg-primary-100'
           onClick={() => navigate('/orders/update-status')}
         >
           <Icon name='ix:app-update' size={24} className='text-white' />

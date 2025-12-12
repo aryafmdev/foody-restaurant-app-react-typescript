@@ -120,6 +120,7 @@ export default function MyReviews() {
                   <div key={rv.id} className='space-y-md'>
                     <ReviewCard
                       name={rv.restaurant?.name ?? 'Restaurant'}
+                      avatarUrl={authUser?.avatar ?? undefined}
                       rating={rv.star}
                       comment={rv.comment ?? ''}
                       date={rv.updatedAt ?? rv.createdAt}

@@ -17,6 +17,7 @@ type MyOrderCardProps = {
   storeName: string;
   items: OrderItem[];
   onGiveReview?: () => void;
+  reviewLabel?: string;
   orderId?: string;
   status?: string;
   className?: string;
@@ -26,6 +27,7 @@ export default function MyOrderCard({
   storeName,
   items,
   onGiveReview,
+  reviewLabel,
   orderId,
   status,
   className,
@@ -117,7 +119,7 @@ export default function MyOrderCard({
               className='mt-lg md:mt-0 w-full md:w-auto rounded-full h-12'
               onClick={onGiveReview}
             >
-              Give Review
+              {reviewLabel ?? 'Give Review'}
             </Button>
           ) : null}
         </div>
