@@ -51,7 +51,7 @@ export default function Success() {
     .format('D MMMM YYYY, HH:mm');
 
   return (
-    <Container className='h-screen flex flex-col items-center justify-center max-w-[428px]'>
+    <Container className='h-screen flex flex-col items-center justify-center w-full'>
       <div className='flex flex-col items-center'>
         <div className='inline-flex items-center gap-sm'>
           <span

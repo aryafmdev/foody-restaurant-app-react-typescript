@@ -23,6 +23,7 @@ import type { Transaction } from '../types/schemas';
 export default function Checkout() {
   const token = useSelector((s: RootState) => s.auth.token);
   const userId = useSelector((s: RootState) => s.auth.userId);
+  const authUser = useSelector((s: RootState) => s.auth.user);
   const isLoggedIn = !!token;
   const navigate = useNavigate();
   const { data, isLoading, isError } = useCartQuery(userId, isLoggedIn);
@@ -110,10 +111,10 @@ export default function Checkout() {
           <div className='space-y-xl'>
             <DeliveryAddressCard
               className='mt-xs'
-              address={'Jl. Sudirman No. 10, Jakarta'}
-              phone={profile?.data?.phone ?? '08xx-xxxx-xxxx'}
+              address={authUser?.address ?? 'Jl. Sudirman No. 10, Jakarta'}
+              phone={authUser?.phone ?? profile?.data?.phone ?? '08xx-xxxx-xxxx'}
               changeLabel='Change'
-              onChange={() => navigate('/profile')}
+              onChange={() => navigate('/address')}
             />
 
             <div>
@@ -154,59 +155,74 @@ export default function Checkout() {
               total={grandTotal}
               buying={checkout.isPending}
               buyingLabel='Buying...'
-              onBuy={() =>
-                checkout.mutate(
-                  { paymentMethod: payment },
-                  {
-                    onSuccess: (res) => {
-                      const tx = res?.data?.transaction;
-                      const restaurantsOptimistic = groups.map((g) => ({
-                        restaurant: {
-                          id: g.restaurant.id,
-                          name: g.restaurant.name,
-                          logo: g.restaurant.logo,
-                        },
-                        items: g.items.map((it) => ({
-                          menuId: it.menu.id,
-                          menuName: it.menu.foodName,
-                          price: it.menu.price,
-                          quantity: it.quantity,
-                          itemTotal: it.itemTotal,
-                        })),
-                        subtotal: g.subtotal,
-                      }));
-                      const optimisticTx: Transaction = {
-                        id: tx?.id,
-                        transactionId: tx?.transactionId ?? `TRX-${Date.now()}`,
+              onBuy={() => {
+                const payload = {
+                  paymentMethod: payment,
+                  restaurants: groups.map((g) => ({
+                    restaurantId: g.restaurant.id,
+                    items: g.items.map((it) => ({
+                      menuId: it.menu.id,
+                      quantity: it.quantity,
+                    })),
+                  })),
+                  deliveryAddress:
+                    authUser?.address ?? 'Jl. Sudirman No. 10, Jakarta',
+                  phone: authUser?.phone ?? profile?.data?.phone,
+                };
+                checkout.mutate(payload, {
+                  onSuccess: (res) => {
+                    const tx = res?.data?.transaction;
+                    const restaurantsOptimistic = groups.map((g) => ({
+                      restaurant: {
+                        id: g.restaurant.id,
+                        name: g.restaurant.name,
+                        logo: g.restaurant.logo,
+                      },
+                      items: g.items.map((it) => ({
+                        menuId: it.menu.id,
+                        menuName: it.menu.foodName,
+                        price: it.menu.price,
+                        quantity: it.quantity,
+                        itemTotal: it.itemTotal,
+                      })),
+                      subtotal: g.subtotal,
+                    }));
+                    const optimisticTx: Transaction = {
+                      id: tx?.id,
+                      transactionId:
+                        tx?.transactionId ?? `TRX-${Date.now()}`,
+                      paymentMethod: tx?.paymentMethod ?? payment,
+                      status: tx?.status ?? 'preparing',
+                      restaurants: restaurantsOptimistic,
+                      pricing: {
+                        subtotal,
+                        serviceFee,
+                        deliveryFee,
+                        totalPrice: grandTotal,
+                      },
+                      createdAt: tx?.createdAt ?? new Date().toISOString(),
+                      deliveryAddress:
+                        tx?.deliveryAddress ?? payload.deliveryAddress,
+                      phone: tx?.phone ?? payload.phone,
+                    };
+                    putOrderHistory(userId ?? 'guest', optimisticTx);
+                    clearCart.mutate();
+                    navigate('/success', {
+                      state: {
+                        transaction: optimisticTx,
                         paymentMethod: tx?.paymentMethod ?? payment,
-                        status: tx?.status ?? 'preparing',
-                        restaurants: restaurantsOptimistic,
-                        pricing: {
-                          subtotal,
-                          serviceFee,
-                          deliveryFee,
-                          totalPrice: grandTotal,
-                        },
-                        createdAt: tx?.createdAt ?? new Date().toISOString(),
-                      };
-                      putOrderHistory(userId ?? 'guest', optimisticTx);
-                      clearCart.mutate();
-                      navigate('/success', {
-                        state: {
-                          transaction: optimisticTx,
-                          paymentMethod: tx?.paymentMethod ?? payment,
-                          createdAt: tx?.createdAt ?? new Date().toISOString(),
-                          itemsCount: summary?.totalItems ?? 0,
-                          subtotal,
-                          deliveryFee,
-                          serviceFee,
-                          total: grandTotal,
-                        },
-                      });
-                    },
-                  }
-                )
-              }
+                        createdAt:
+                          tx?.createdAt ?? new Date().toISOString(),
+                        itemsCount: summary?.totalItems ?? 0,
+                        subtotal,
+                        deliveryFee,
+                        serviceFee,
+                        total: grandTotal,
+                      },
+                    });
+                  },
+                });
+              }}
             />
           </div>
         </div>
