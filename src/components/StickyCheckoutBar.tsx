@@ -18,7 +18,7 @@ type StickyCheckoutBarProps = {
 export default function StickyCheckoutBar({ itemsCount, totalPrice, onCheckout, iconName = 'lets-icons:bag-fill', buttonLabel = 'Checkout', visible = true, showOnMobileOnly = true, className, }: StickyCheckoutBarProps) {
   if (!visible) return null
   return (
-    <div className={cn('fixed bottom-0 left-0 right-0 z-50', showOnMobileOnly ? 'md:hidden' : undefined, className)}>
+    <div className={cn('fixed bottom-0 left-0 right-0 z-50', showOnMobileOnly ? '' : undefined, className)}>
       <div className='border-t border-neutral-200 bg-white shadow-lg'>
         <Container className='py-md flex items-center justify-between'>
           <div>

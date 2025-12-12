@@ -113,36 +113,51 @@ export default function Login() {
       });
       const token = res.data.token;
       const userId = String(res.data.user.id);
+      let savedLat: number | null = null;
+      let savedLong: number | null = null;
+      try {
+        const raw = localStorage.getItem('userlocation');
+        if (raw) {
+          const obj = JSON.parse(raw) as {
+            latitude?: unknown;
+            longitude?: unknown;
+          };
+          const latVal =
+            typeof obj.latitude === 'number'
+              ? (obj.latitude as number)
+              : Number(obj.latitude);
+          const longVal =
+            typeof obj.longitude === 'number'
+              ? (obj.longitude as number)
+              : Number(obj.longitude);
+          if (Number.isFinite(latVal) && Number.isFinite(longVal)) {
+            savedLat = latVal;
+            savedLong = longVal;
+          }
+        }
+      } catch {
+        savedLat = null;
+        savedLong = null;
+      }
+      const nextUser = {
+        id: String(res.data.user.id),
+        name: res.data.user.name ?? null,
+        email: res.data.user.email ?? null,
+        phone: res.data.user.phone ?? null,
+        avatar: res.data.user.avatar ?? null,
+        latitude:
+          (savedLat ?? (res.data.user.latitude ?? null)) ?? null,
+        longitude:
+          (savedLong ?? (res.data.user.longitude ?? null)) ?? null,
+      };
       dispatch(setToken(token));
       dispatch(setUserId(userId));
-      dispatch(
-        setUser({
-          id: String(res.data.user.id),
-          name: res.data.user.name ?? null,
-          email: res.data.user.email ?? null,
-          phone: res.data.user.phone ?? null,
-          avatar: res.data.user.avatar ?? null,
-          latitude: res.data.user.latitude ?? null,
-          longitude: res.data.user.longitude ?? null,
-        })
-      );
+      dispatch(setUser(nextUser));
       try {
         sessionStorage.setItem(
           'auth',
-          JSON.stringify({ token, userId, user: res.data.user })
+          JSON.stringify({ token, userId, user: nextUser })
         );
-      } catch {
-        void 0;
-      }
-      try {
-        const lat = res.data.user.latitude;
-        const long = res.data.user.longitude;
-        if (typeof lat === 'number' && typeof long === 'number') {
-          localStorage.setItem(
-            'userlocation',
-            JSON.stringify({ latitude: lat, longitude: long })
-          );
-        }
       } catch {
         void 0;
       }
@@ -154,8 +169,8 @@ export default function Login() {
           email: res.data.user.email,
           phone: res.data.user.phone,
           avatar: res.data.user.avatar,
-          latitude: res.data.user.latitude,
-          longitude: res.data.user.longitude,
+          latitude: nextUser.latitude ?? null,
+          longitude: nextUser.longitude ?? null,
           createdAt: res.data.user.createdAt,
         },
       });
@@ -163,7 +178,7 @@ export default function Login() {
         try {
           localStorage.setItem(
             'auth',
-            JSON.stringify({ token, userId, user: res.data.user })
+            JSON.stringify({ token, userId, user: nextUser })
           );
         } catch {
           void 0;
@@ -171,7 +186,6 @@ export default function Login() {
       } else {
         try {
           localStorage.removeItem('auth');
-          localStorage.removeItem('userlocation');
         } catch {
           void 0;
         }
@@ -244,36 +258,51 @@ export default function Login() {
       });
       const token = res.data.token;
       const userId = String(res.data.user.id);
+      let savedLat: number | null = null;
+      let savedLong: number | null = null;
+      try {
+        const raw = localStorage.getItem('userlocation');
+        if (raw) {
+          const obj = JSON.parse(raw) as {
+            latitude?: unknown;
+            longitude?: unknown;
+          };
+          const latVal =
+            typeof obj.latitude === 'number'
+              ? (obj.latitude as number)
+              : Number(obj.latitude);
+          const longVal =
+            typeof obj.longitude === 'number'
+              ? (obj.longitude as number)
+              : Number(obj.longitude);
+          if (Number.isFinite(latVal) && Number.isFinite(longVal)) {
+            savedLat = latVal;
+            savedLong = longVal;
+          }
+        }
+      } catch {
+        savedLat = null;
+        savedLong = null;
+      }
+      const nextUser = {
+        id: String(res.data.user.id),
+        name: res.data.user.name ?? null,
+        email: res.data.user.email ?? null,
+        phone: res.data.user.phone ?? null,
+        avatar: res.data.user.avatar ?? null,
+        latitude:
+          (savedLat ?? (res.data.user.latitude ?? null)) ?? null,
+        longitude:
+          (savedLong ?? (res.data.user.longitude ?? null)) ?? null,
+      };
       dispatch(setToken(token));
       dispatch(setUserId(userId));
-      dispatch(
-        setUser({
-          id: String(res.data.user.id),
-          name: res.data.user.name ?? null,
-          email: res.data.user.email ?? null,
-          phone: res.data.user.phone ?? null,
-          avatar: res.data.user.avatar ?? null,
-          latitude: res.data.user.latitude ?? null,
-          longitude: res.data.user.longitude ?? null,
-        })
-      );
+      dispatch(setUser(nextUser));
       try {
         sessionStorage.setItem(
           'auth',
-          JSON.stringify({ token, userId, user: res.data.user })
+          JSON.stringify({ token, userId, user: nextUser })
         );
-      } catch {
-        void 0;
-      }
-      try {
-        const lat = res.data.user.latitude;
-        const long = res.data.user.longitude;
-        if (typeof lat === 'number' && typeof long === 'number') {
-          localStorage.setItem(
-            'userlocation',
-            JSON.stringify({ latitude: lat, longitude: long })
-          );
-        }
       } catch {
         void 0;
       }
@@ -285,8 +314,8 @@ export default function Login() {
           email: res.data.user.email,
           phone: res.data.user.phone,
           avatar: res.data.user.avatar,
-          latitude: res.data.user.latitude,
-          longitude: res.data.user.longitude,
+          latitude: nextUser.latitude ?? null,
+          longitude: nextUser.longitude ?? null,
           createdAt: res.data.user.createdAt,
         },
       });
