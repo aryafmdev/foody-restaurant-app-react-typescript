@@ -34,7 +34,7 @@ export default function RestaurantInfoCard({
           </div>
           <div className='flex-1 min-w-0 flex flex-col gap-xxs'>
             <div
-              className='text-[clamp(1rem,1.25vw,1.125rem)] font-extrabold text-neutral-950 break-words'
+              className='text-[clamp(0.8rem,0.75vw+0.5rem,1rem)] leading-tight tracking-tight font-extrabold text-neutral-950 break-words'
               style={{
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
@@ -54,7 +54,7 @@ export default function RestaurantInfoCard({
                 {rating.toFixed(1)}
               </span>
             </div>
-            <div className='text-[clamp(0.875rem,1.11vw,1rem)] md:text-md text-neutral-950 break-words'>
+            <div className='text-[clamp(0.8125rem,0.35vw+0.55rem,1rem)] leading-tight tracking-tight text-neutral-950 break-words'>
               {formatPlaceAndDistance(place ?? 'Jakarta Pusat', distanceKm)}
             </div>
           </div>

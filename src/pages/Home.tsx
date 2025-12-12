@@ -52,17 +52,7 @@ export default function Home() {
   const baseCount = 12;
   const totalTarget = baseCount + extraRecommendedCount;
   const realItems = recList.slice(0, Math.min(recList.length, totalTarget));
-  const fallbackCount = Math.max(0, totalTarget - realItems.length);
-  const fallbackItems = Array.from({ length: fallbackCount }).map((_, i) => ({
-    id: `f-${i}`,
-    name: 'Foody Restaurant',
-    logo: undefined,
-    place: 'Nearby',
-    star: 0,
-  }));
-  const canShowMore =
-    extraRecommendedCount === 0 &&
-    (recList.length > baseCount || recList.length <= baseCount);
+  const canShowMore = extraRecommendedCount === 0 && recList.length > baseCount;
   const searchResultsRef = useRef<HTMLDivElement | null>(null);
   const onSearchSubmit = () => {
     setSearchSubmitted(true);
@@ -194,16 +184,6 @@ export default function Home() {
                       >
                         <RecCard r={r} />
                       </Link>
-                    ))}
-                    {fallbackItems.map((f) => (
-                      <div key={f.id} className='block'>
-                        <RestaurantInfoCard
-                          name={f.name}
-                          logo={f.logo}
-                          place={f.place}
-                          rating={0}
-                        />
-                      </div>
                     ))}
                   </>
                 )}
